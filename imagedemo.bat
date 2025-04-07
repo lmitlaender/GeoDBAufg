@@ -1,0 +1,1 @@
+java -cp .;geo.jar ImageDemo 127.0.0.1/5432/dbuser/dbuser/deproDBMittelfrankenPG

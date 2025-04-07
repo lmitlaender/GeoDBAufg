@@ -1,0 +1,1 @@
+javac -cp .;geo.jar *.java

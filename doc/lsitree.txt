@@ -1,0 +1,958 @@
+
+d:\lsi\source\pp\lsi>java -Xmx1000M pp.lsi.checkLSIkeys TREE 
+**** DUMP CLASS TREE
+
+784 LSI classes
+
+[]===+[ UNDEF ]..............................'nicht belegt' #0
+||   
+[]===+[ ORG ]................................'Organisatorisches Objekt (unspezifiziert)' #10000000
+||   +----[ COUNTRY ]............................'Land' #11000000
+||   |   
+||   +---+[ LARGEREGION ]........................'Größere Region (unspezifiziert)' #12000000
+||   |   +----[ BUNDESLAND ].........................'Bundesland' #12100000
+||   |   +----[ REGBEZ ].............................'Regierungsbezirk' #12200000
+||   |   +----[ REGION ].............................'Region' #12300000
+||   |       
+||   +---+[ CITY_ALL ]...........................'Stadt, Landkreis, Gemeinde (unspezifiziert)' #13000000
+||   |   +----[ KREISFREIE_STADT_LANDKREIS ].........'Kreisfreie Stadt, Landkreis' #13100000
+||   |   +----[ AMTSGEMEINDE ].......................'Amtsgemeinde' #13200000
+||   |   +----[ STADT_GEMEINDE ].....................'Stadt, Gemeinde' #13300000
+||   |       
+||   +----[ STADTTEIL ]..........................'Stadtteil' #14000000
+||   |   
+||   +---+[ POSTALAREA ].........................'Post- und Adressbereich (unspezifiziert)' #15000000
+||   |   +----[ POSTLEITZAHLBEREICH ]................'Postleitzahlbereich' #15100000
+||   |   +----[ ADDRESS_POINT ]......................'Adress-Punkt' #15200000
+||   |   +----[ ADDRESS_LINE ].......................'Adress-Linie' #15300000
+||   |   +----[ ADDRESS_AREA ].......................'Adress-Fläche' #15400000
+||   |       
+||   +---+[ VIRTLINE ]...........................'Virtueller Linienzug' #16000000
+||   |   +---+[ VIRTPATH ]...........................'Virtueller Pfad' #16100000
+||   |   |   +---+[ ROUTE ]..............................'Route' #16110000
+||   |   |   |   +----[ ROUTE_TRAIN ]........................'Zugroute' #16111000
+||   |   |   |   +----[ ROUTE_TRAM ].........................'Tramroute' #16112000
+||   |   |   |   +----[ ROUTE_BUS ]..........................'Busroute' #16113000
+||   |   |   |   +----[ ROUTE_HIKING ].......................'Wanderroute' #16114000
+||   |   |   |   +----[ ROUTE_ROAD ].........................'Straßenroute' #16115000
+||   |   |   |   +----[ ROUTE_BICYCLE ]......................'Fahrradroute' #16116000
+||   |   |   |   +----[ ROUTE_FOOT ].........................'Fußroute' #16117000
+||   |   |   |   +----[ ROUTE_DETOUR ].......................'Umleitung' #16118000
+||   |   |   |   +----[ ROUTE_POWER ]........................'Energieroute' #16119000
+||   |   |   |       
+||   |   |   +----[ HAUSNUMMERNFOLGE ]...................'Hausnummernfolge' #16120000
+||   |   |   +----[ NAHVERKEHRSLINIE ]...................'Nahverkehrslinie' #16130000
+||   |   |   +----[ NAHVERKEHRSLINIE_BUS ]...............'Buslinie' #16140000
+||   |   |       
+||   |   +---+[ GRENZE ].............................'Grenze (unspezifiziert)' #16200000
+||   |       +----[ STADTTEILGRENZE ]....................'Stadtteilgrenze' #16210000
+||   |       +----[ STADT_LANDKREISGRENZE ]..............'Stadt-, Landkreisgrenze' #16220000
+||   |       +----[ REGBEZ_GRENZE ]......................'Regierungsbezirksgrenze' #16230000
+||   |       +----[ BUNDESLANDGRENZE ]...................'Bundeslandgrenze' #16240000
+||   |       +----[ LANDESGRENZE ].......................'Landesgrenze' #16250000
+||   |           
+||   +---+[ CAPTION ]............................'Beschriftung (unspezifiziert)' #17000000
+||   |   +--------[ BESCHRIFTUNG_KONTINENT ].............'Beschriftung Kontinent' #17010000
+||   |   +--------[ BESCHRIFTUNG_STAAT ].................'Beschriftung Staat' #17020000
+||   |   +--------[ BESCHRIFTUNG_BUNDESLAND ]............'Beschriftung Bundesland' #17030000
+||   |   +--------[ BESCHRIFTUNG_REGION ]................'Beschriftung Region' #17040000
+||   |   +--------[ BESCHRIFTUNG_LANDKREIS ].............'Beschriftung Landkreis' #17050000
+||   |   +--------[ BESCHRIFTUNG_STADT ].................'Beschriftung Stadt' #17060000
+||   |   +--------[ BESCHRIFTUNG_KLEINSTADT ]............'Beschriftung Kleinstadt' #17070000
+||   |   +--------[ BESCHRIFTUNG_STADTTEIL ].............'Beschriftung Stadtteil' #17080000
+||   |   +--------[ BESCHRIFTUNG_DORF ]..................'Beschriftung Dorf' #17090000
+||   |   +--------[ BESCHRIFTUNG_VORORT ]................'Beschriftung Vorort' #17100000
+||   |   +--------[ BESCHRIFTUNG_LOKALITAET ]............'Beschriftung Lokalität' #17110000
+||   |   +--------[ BESCHRIFTUNG_INSEL ].................'Beschriftung Insel' #17120000
+||   |   +--------[ BESCHRIFTUNG_KLEININSEL ]............'Beschriftung Kleininsel' #17130000
+||   |           
+||   +---+[ OBSOLETE ]...........................'Veraltet' #18000000
+||       +----[ OBSOLETE_COUNTRY ]...................'Land (veraltet)' #18100000
+||       +----[ OBSOLETE_BUNDESLAND ]................'Bundesland (veraltet)' #18200000
+||       +----[ OBSOLETE_REGBEZ ]....................'Regierungsbezirk (veraltet)' #18300000
+||       +----[ OBSOLETE_KREISFREIE_STADT_LANDKREIS ]'Kreisfreie Stadt, Landkreis (veraltet)' #18400000
+||           
+[]===+[ INHABITED ]..........................'Bebaute Fläche (unspezifiziert)' #20000000
+||   +-------+[ RESIDENTIAL ]........................'Wohngebiet (unspezifiziert)' #20100000
+||   |       +----[ BUILDINGAREA ].......................'Baugebiet' #20110000
+||   |       |   
+||   |       +---+[ BUILDING ]...........................'Gebäude' #20120000
+||   |       |   +--------[ RESIDENTIAL_BUILDING ]...............'Wohngebäude' #20120100
+||   |       |   +--------[ HOUSE ]..............................'Haus' #20120200
+||   |       |   +--------[ CARPORT ]............................'Carport' #20120300
+||   |       |   +--------[ GARAGE ].............................'Garage' #20120400
+||   |       |   +--------[ GARAGES ]............................'Garages' #20120500
+||   |       |   +--------[ APPARTEMENTS ].......................'Appartements' #20120600
+||   |       |   +--------[ TERRACE ]............................'Reihenhäuser' #20120700
+||   |       |   +--------[ DETACHED ]...........................'Einzelhaus' #20120800
+||   |       |   +--------[ INDUSTRIAL_BUILDING ]................'Industriegebäude' #20120900
+||   |       |   +--------[ COMMERCIAL_BUILDING ]................'Handelsgebäude' #20121000
+||   |       |   +--------[ SCHOOL_BUILDING ]....................'Schulgebäude' #20121100
+||   |       |   +--------[ FARM_BUILDING ]......................'Bauernhaus' #20121200
+||   |       |   +--------[ BARN_BUILDING ]......................'Scheune' #20121300
+||   |       |   +--------[ SHED ]...............................'Schuppen' #20121400
+||   |       |   +--------[ HUT ]................................'Hütte' #20121500
+||   |       |   +--------[ UNTERSTAND ].........................'Unterstand' #20121600
+||   |       |   +--------[ GEWAECHSHAUS ].......................'Gewächshaus' #20121700
+||   |       |           
+||   |       +---+[ BUILDING_PART ]......................'Gebäudeteil' #20130000
+||   |           +----[ BUILDING_ENTRANCE ]..................'Gebäudeeingang' #20131000
+||   |           +----[ ROOF ]...............................'Überdach' #20132000
+||   |           +----[ ELEVATOR ]...........................'Fahrstuhl' #20133000
+||   |           +----[ DOOR ]...............................'Tür' #20134000
+||   |               
+||   +-------+[ ACADEMIC ]...........................'Öffentliche Forschungs- und Bildungsstätte (unspezifiziert)' #20200000
+||   |       +---+[ EDUCATION ]..........................'Öffentliche Bildungsstätte (unspezifiziert)' #20210000
+||   |       |   +----[ UNIVERSITY ].........................'Hochschule' #20211000
+||   |       |   |   
+||   |       |   +---+[ GRUND_SEKUNDARSCHULE ]...............'Grund- und Sekundarschule (unspezifiziert)' #20212000
+||   |       |   |   +----[ GYMNASIUM ]..........................'Gymnasium' #20212100
+||   |       |   |   +----[ REALSCHULE ].........................'Realschule' #20212200
+||   |       |   |   +----[ HAUPTSCHULE ]........................'Hauptschule' #20212300
+||   |       |   |   +----[ GRUNDSCHULE ]........................'Grundschule' #20212400
+||   |       |   |       
+||   |       |   +----[ BERUFSSCHULE ].......................'Berufsschule' #20213000
+||   |       |   |   
+||   |       |   +---+[ BESONDERE_SCHULE ]...................'Besondere Schule (unspezifiziert)' #20214000
+||   |       |       +----[ MUSIKSCHULE ]........................'Musikschule' #20214100
+||   |       |           
+||   |       +----[ LIBRARY ]............................'Bibliothek' #20220000
+||   |       +----[ RESEARCH ]...........................'Forschungsstätte' #20230000
+||   |       |   
+||   |       +---+[ ASTRONOMIE ].........................'Observatorium (unspezifiziert)' #20240000
+||   |           +----[ OBSERVATORIUM ]......................'Observatorium' #20241000
+||   |           +----[ RADIOTELESKOP ]......................'Radioteleskop' #20242000
+||   |               
+||   +-------+[ MELDUNGSEINRICHTUNGEN ]..............'Meldungseinrichtung (unspezifiziert)' #20300000
+||   |       +----[ TELEFONZELLE ].......................'Telefonzelle' #20310000
+||   |       +----[ NOTRUFTELEFON ]......................'Notruftelefon' #20320000
+||   |       +----[ UEBERWACHUNGSCAMERA ]................'Überwachungscamera' #20330000
+||   |           
+||   +-------+[ INDUSTRIAL ].........................'Industriefläche (unspezifiziert)' #20400000
+||   |       +---+[ MINING ].............................'Industriefläche Bergbau' #20410000
+||   |       |   +----[ STONE_PIT ]..........................'Steinbruch' #20411000
+||   |       |   +----[ SCHACHT ]............................'Schacht' #20412000
+||   |       |       
+||   |       +---+[ POWER_PLANT ]........................'Kraftwerk (unspezifiziert)' #20420000
+||   |       |   +--------[ NUCEAR_POWER_PLANT ].................'Atomkraftwerk' #20420100
+||   |       |   |       
+||   |       |   +-------+[ FOSSIL_POWER_PLANT ].................'Fossilkraftwerk' #20420200
+||   |       |   |       +----[ KOHLE_KRAFTWERK ]....................'Kohlekraftwerk' #20420210
+||   |       |   |       +----[ OEL_KRAFTWERK ]......................'Ölkraftwerk' #20420220
+||   |       |   |       +----[ GAS_KRAFTWERK ]......................'Gaskraftwerk' #20420230
+||   |       |   |           
+||   |       |   +-------+[ BRENN_POWER_PLANT ]..................'Brennkraftwerk' #20420300
+||   |       |   |       +----[ BIOMASSEN_KRAFTWERK ]................'Biomassenkraftwerk' #20420310
+||   |       |   |       +----[ BIOFUEL_KRAFTWERK ]..................'Biokraftstoffkraftwerk' #20420320
+||   |       |   |       +----[ MUELL_KRAFTWERK ]....................'Müllkraftwerk' #20420330
+||   |       |   |           
+||   |       |   +--------[ WINDKRAFTWERK ]......................'Windkraftwerk' #20420400
+||   |       |   +--------[ WINDMUEHLE ].........................'Windmühle' #20420500
+||   |       |   +--------[ SOLAR_KRAFTWERK ]....................'Solarkraftwerk' #20420600
+||   |       |   +--------[ WASSER_KRAFTWERK ]...................'Wasserkraftwerk' #20420700
+||   |       |   +--------[ MUEHLE ].............................'Mühle' #20420800
+||   |       |   |       
+||   |       |   +-------+[ POWER_PLANT_ADDON ]..................'Kraftwerkergänzung (unspezifiziert)' #20420900
+||   |       |           +----[ UMSPANNSTATION ].....................'Umspannstation' #20420910
+||   |       |           +----[ WASSERRAD ]..........................'Wasserrad' #20420920
+||   |       |           +----[ STROMMAST ]..........................'Strommast' #20420930
+||   |       |           +----[ STROMLEITUNG ].......................'Stromleitung' #20420940
+||   |       |           +----[ STROMVERTEILER ].....................'Stromverteilerkasten' #20420950
+||   |       |           +----[ TRAFOHAUS ]..........................'Trafohaus' #20420960
+||   |       |           +----[ TRANSFORMATOR ]......................'Transformator' #20420970
+||   |       |               
+||   |       +---+[ WASSERAUFBEREITUNG ].................'Wasseraufbereitung (unspezifiziert)' #20430000
+||   |       |   +----[ WASSERWERK ].........................'Wasserwerk' #20431000
+||   |       |   +----[ BRUNNEN ]............................'Brunnen' #20432000
+||   |       |   +----[ BASIN ]..............................'Basin' #20433000
+||   |       |   +----[ RESERVOIR ]..........................'Reservoir' #20434000
+||   |       |   +----[ STAUDAMM ]...........................'Staudamm' #20435000
+||   |       |   +----[ WASSERHOCHBEHAELTER ]................'Wasserhochbehälter' #20436000
+||   |       |   +----[ WASSERTURM ].........................'Wasserturm' #20437000
+||   |       |   +----[ KLAERWERK ]..........................'Klärwerk' #20438000
+||   |       |       
+||   |       +----[ ROHRLEITUNG ]........................'Rohrleitung (unspezifiziert)' #20440000
+||   |           
+||   +-------+[ COMMERCIAL ].........................'Kommerzielle Nutzung (unspezifiziert)' #20500000
+||   |       +-------+[ GASTRONOMY ].........................'Gastronomie (unspezifiziert)' #20501000
+||   |       |       +----[ CATERING ]...........................'Catering' #20501100
+||   |       |       |   
+||   |       |       +---+[ RESTAURANT ].........................'Restaurant (unspezifiziert)' #20501200
+||   |       |       |   +---+[ RESTAURANT_REGIONAL ]................'Restaurant (regionale Küche)' #20501210
+||   |       |       |   |   +----[ RESTAURANT_BAYRISCH ]................'Restaurant (bayerische Küche)' #20501211
+||   |       |       |   |   +----[ RESTAURANT_FRAENKISCH ]..............'Restaurant (fränkische Küche)' #20501212
+||   |       |       |   |       
+||   |       |       |   +----[ RESTAURANT_NATIONAL ]................'Restaurant (nationale Küche)' #20501220
+||   |       |       |   +----[ RESTAURANT_INTERNATIONAL ]...........'Restaurant (internationale Küche)' #20501230
+||   |       |       |   |   
+||   |       |       |   +---+[ RESTAURANT_SPECIAL_CUISINE ].........'Restaurant mit spezieller Ausrichtung' #20501240
+||   |       |       |   |   +----[ PIZZERIA ]...........................'Pizzeria' #20501241
+||   |       |       |   |   +----[ SEAFOOD ]............................'Fisch-Restaurant, Seafood' #20501242
+||   |       |       |   |   +----[ VEGETARISCH ]........................'Restaurant (vegetarisch)' #20501243
+||   |       |       |   |   +----[ STEAKHAUS ]..........................'Restaurant (Steakhaus)' #20501244
+||   |       |       |   |   +----[ GEFLUEGEL ]..........................'Restaurant (Geflügel)' #20501245
+||   |       |       |   |   +----[ KEBAB ]..............................'Restaurant (Kebab)' #20501246
+||   |       |       |   |   +----[ SUSHI ]..............................'Restaurant (Sushi)' #20501247
+||   |       |       |   |       
+||   |       |       |   +---+[ RESTAURANT_EUROPEAN ]................'Restaurant (europäische Küche)' #20501250
+||   |       |       |   |   +----[ RESTAURANT_DEUTSCH ].................'Restaurant (deutsche Küche)' #20501251
+||   |       |       |   |   +----[ RESTAURANT_OESTERREICHISCH ].........'Restaurant (österreichische Küche)' #20501252
+||   |       |       |   |   +----[ RESTAURANT_FRANZOESISCH ]............'Restaurant (französische Küche)' #20501253
+||   |       |       |   |   +----[ RESTAURANT_BALKAN ]..................'Restaurant (balkan-Küche)' #20501254
+||   |       |       |   |   +----[ RESTAURANT_MEDITERRAN ]..............'Restaurant (mediterrane Küche)' #20501255
+||   |       |       |   |   +----[ RESTAURANT_GRIECHISCH ]..............'Restaurant (griechische Küche)' #20501256
+||   |       |       |   |   +----[ RESTAURANT_ITALIENISCH ].............'Restaurant (italienische Küche)' #20501257
+||   |       |       |   |   +----[ RESTAURANT_PORTUGISISCH ]............'Restaurant (portugiesische Küche)' #20501258
+||   |       |       |   |   +----[ RESTAURANT_SPANISCH ]................'Restaurant (spanische Küche)' #20501259
+||   |       |       |   |       
+||   |       |       |   +---+[ RESTAURANT_ASIATISCH ]...............'Restaurant (asiatische Küche)' #20501260
+||   |       |       |   |   +----[ RESTAURANT_CHINESISCH ]..............'Restaurant (chinesische Küche)' #20501261
+||   |       |       |   |   +----[ RESTAURANT_INDISCHE ]................'Restaurant (indische Küche)' #20501262
+||   |       |       |   |   +----[ RESTAURANT_JAPANISCH ]...............'Restaurant (japanische Küche)' #20501263
+||   |       |       |   |   +----[ RESTAURANT_PAKISTANISCH ]............'Restaurant (pakistanische Küche)' #20501264
+||   |       |       |   |   +----[ RESTAURANT_THAILAENDISCH ]...........'Restaurant (thailändische Küche)' #20501265
+||   |       |       |   |   +----[ RESTAURANT_TIBETANISCH ].............'Restaurant (tibetanische Küche)' #20501266
+||   |       |       |   |   +----[ RESTAURANT_VIETNAMESISCH ]...........'Restaurant (vietnamesische Küche)' #20501267
+||   |       |       |   |       
+||   |       |       |   +---+[ RESTAURANT_ORIENTALISCH ]............'Restaurant (orientalische Küche)' #20501270
+||   |       |       |   |   +----[ RESTAURANT_TUERKISCH ]...............'Restaurant (türkische Küche)' #20501271
+||   |       |       |   |   +----[ RESTAURANT_ARABISCH ]................'Restaurant (arabische Küche)' #20501272
+||   |       |       |   |       
+||   |       |       |   +---+[ RESTAURANT_MORE_INTERNATIONAL ]......'Restaurant (weitere internationale Küche)' #20501280
+||   |       |       |       +----[ RESTAURANT_AMERIKANISCH ]............'Restaurant (amerikanische Küche)' #20501281
+||   |       |       |       +----[ RESTAURANT_AFRIKANISCH ].............'Restaurant (afrikanische Küche)' #20501282
+||   |       |       |       +----[ RESTAURANT_SUEDAMERIKANISCH ]........'Restaurant (südamerikanische Küche)' #20501283
+||   |       |       |           
+||   |       |       +---+[ GASTRONOMY_MORE ]....................'Weitere Gastronomie (unspezifiziert)' #20501300
+||   |       |       |   +----[ KNEIPE ].............................'Kneipe' #20501310
+||   |       |       |   +----[ CAFE ]...............................'Cafe' #20501320
+||   |       |       |   +----[ EISDIELE ]...........................'Eisdiele' #20501330
+||   |       |       |   +----[ BIERGARTEN ].........................'Biergarten' #20501340
+||   |       |       |   +----[ FASTFOOD ]...........................'Fast Food' #20501350
+||   |       |       |       
+||   |       |       +----[ GASTRONOMY_AREA ]....................'Gastronomiebereich' #20501400
+||   |       |           
+||   |       +-------+[ SHOP ]...............................'Geschäft (unspezifiziert)' #20502000
+||   |       |       +---+[ LEBENSMITTEL ].......................'Lebensmittel (unspezifiziert)' #20502100
+||   |       |       |   +----[ SUPERMARKT ].........................'Supermarkt' #20502110
+||   |       |       |   +----[ CONVENIENCE ]........................'Bedarfsmittelgeschäft' #20502120
+||   |       |       |   +----[ GETRAENKEMARKT ].....................'Getränkemarkt' #20502130
+||   |       |       |   +----[ WEINHANDEL ].........................'Weinhandel' #20502140
+||   |       |       |   +----[ BAECKER ]............................'Bäcker' #20502150
+||   |       |       |   +----[ FLEISCHER ]..........................'Fleischer' #20502160
+||   |       |       |       
+||   |       |       +---+[ KOERPERPFLEGE ]......................'Körperpflege und Gesundheit (unspezifiziert)' #20502200
+||   |       |       |   +----[ DROGERIE ]...........................'Drogerie' #20502210
+||   |       |       |   +----[ SANITAETSBEDARF ]....................'Sanitätsbedarf' #20502220
+||   |       |       |   +----[ SONNENSTUDIO ].......................'Sonnenstudio' #20502230
+||   |       |       |       
+||   |       |       +---+[ KLEIDUNG ]...........................'Kleidung (unspezifiziert)' #20502300
+||   |       |       |   +----[ KLEIDUNGSGESCHAEFT ].................'Kleidungsgeschäft' #20502310
+||   |       |       |   +----[ BOUTIQUE ]...........................'Boutique' #20502320
+||   |       |       |   +----[ SCHUHGESCHAEFT ].....................'Schuhgeschäft' #20502330
+||   |       |       |       
+||   |       |       +---+[ SPORT_FREIZEIT_SHOP ]................'Sport und Freizeit (unspezifiziert)' #20502400
+||   |       |       |   +----[ SPORTGESCHAEFT ].....................'Sportgeschäft' #20502410
+||   |       |       |   |   
+||   |       |       |   +---+[ FAHRRADGESCHAEFT_ALL ]...............'Fahrradgeschäft (unspezifizert)' #20502420
+||   |       |       |   |   +----[ FAHRRADGESCHAEFT ]...................'Fahrradgeschäft' #20502421
+||   |       |       |   |   +----[ FAHRRADREPARATUR ]...................'Fahrradreparatur' #20502422
+||   |       |       |   |   +----[ FAHRRADAUSLEIHE ]....................'Fahrradausleihe' #20502423
+||   |       |       |   |       
+||   |       |       |   +----[ MOTORRADGESCHAEFT ]..................'Motorradgeschäft' #20502430
+||   |       |       |       
+||   |       |       +---+[ ELEKTRONIKSHOP ].....................'Elektronik (unspezifiziert)' #20502500
+||   |       |       |   +----[ ELEKTRONIKGESCHAEFT ]................'Elektronikgeschäft' #20502510
+||   |       |       |   +----[ MOBILFUNK_HANDY_SHOP ]...............'Mobilfunk und Handys' #20502520
+||   |       |       |   +----[ COMPUTERGESCHAEFT ]..................'Computergeschäft' #20502530
+||   |       |       |   +----[ HIFI_GERAETE ].......................'HIFI-Geräte' #20502540
+||   |       |       |       
+||   |       |       +---+[ HOBBY_SHOP ].........................'Einkauf Hobby (unspezifiziert)' #20502600
+||   |       |       |   +----[ SPIELZEUGGESCHAEFT ].................'Spielzeuggeschäft' #20502610
+||   |       |       |   +----[ BASTELGESCHAEFT ]....................'Bastel- und Creativgeschäft' #20502620
+||   |       |       |       
+||   |       |       +---+[ BAUEN_EINRICHTEN_GARTEN ]............'Markt für Bauen, Einrichten, Garten (unspezifiziert)' #20502700
+||   |       |       |   +----[ MOEBELHAUS ].........................'Möbelhaus' #20502710
+||   |       |       |   +----[ BAUMARKT ]...........................'Baumarkt' #20502720
+||   |       |       |   +----[ GARTENMARKT ]........................'Gartenmarkt, Gärtnerei' #20502730
+||   |       |       |       
+||   |       |       +---+[ LESEN_SCHREIBEN ]....................'Schreiben und Lesen (unspezifiziert)' #20502800
+||   |       |       |   +----[ BUCHGESCHAEFT ]......................'Buchgeschäft' #20502810
+||   |       |       |   +----[ SCHREIBBEDARF ]......................'Schreibbedarf' #20502820
+||   |       |       |       
+||   |       |       +---+[ SHOP_MORE ]..........................'Sonstige Geschäfte (unspezifiziert)' #20502900
+||   |       |           +----[ GESCHENKARTIKEL ]....................'Geschenkartikel' #20502910
+||   |       |           +----[ FLORIST ]............................'Florist' #20502920
+||   |       |           +----[ KIOSK ]..............................'Kiosk' #20502930
+||   |       |           +----[ FOTOS ]..............................'Fotos' #20502940
+||   |       |           +----[ GALERIE ]............................'Galerie' #20502950
+||   |       |               
+||   |       +-------+[ HANDWERK ]...........................'Handwerk (unspezifiziert)' #20503000
+||   |       |       +--------[ BAUMEISTER ].........................'Baumeister' #20503010
+||   |       |       +--------[ BILDHAUER ]..........................'Bildhauer' #20503020
+||   |       |       +--------[ BLEICHER ]...........................'Bleicher' #20503030
+||   |       |       +--------[ BODENLEGER ].........................'Bodenleger' #20503040
+||   |       |       +--------[ BRAUEREI ]...........................'Brauerei' #20503050
+||   |       |       +--------[ BRENNEREI ]..........................'Brennerei' #20503060
+||   |       |       +--------[ BUCHBINDER ].........................'Buchbinder' #20503070
+||   |       |       +--------[ DACHDECKER ].........................'Dachdecker' #20503080
+||   |       |       +--------[ DRECHSLER ]..........................'Drechsler' #20503090
+||   |       |       +--------[ EDVBERATUNG ]........................'EDV-Beratung' #20503100
+||   |       |       +--------[ ELEKTRIKER ].........................'Elektriker' #20503110
+||   |       |       +--------[ FLIESENLEGER ].......................'Fliesenleger' #20503120
+||   |       |       +--------[ FOTOGRAF ]...........................'Fotograf' #20503130
+||   |       |       +--------[ GAERTNER ]...........................'Gärtner' #20503140
+||   |       |       +--------[ GERUESTBAUER ].......................'Gerüstbauer' #20503150
+||   |       |       +--------[ GLASER ].............................'Glaser' #20503160
+||   |       |       +--------[ HEIZUNG_LUEFTUNG ]...................'Heizung und Lüftung' #20503170
+||   |       |       +--------[ IMKER ]..............................'Imker' #20503180
+||   |       |       +--------[ KLEMPNER ]...........................'Klempner und Installateur' #20503190
+||   |       |       +--------[ MALER ]..............................'Maler' #20503200
+||   |       |       +--------[ MAUERER ]............................'Maurer' #20503210
+||   |       |       +--------[ METALLBAU ]..........................'Metallbau' #20503220
+||   |       |       +--------[ MOEBELTISCHLER ].....................'Möbeltischler' #20503230
+||   |       |       +--------[ SATTLER ]............................'Sattler' #20503240
+||   |       |       +--------[ SCHLOSSER ]..........................'Schlosser' #20503250
+||   |       |       +--------[ SCHLUESSELDIENST ]...................'Schlüsseldienst' #20503260
+||   |       |       +--------[ SCHMIED ]............................'Schmied' #20503270
+||   |       |       +--------[ SCHNEIDER ]..........................'Schneider' #20503280
+||   |       |       +--------[ SCHUHMACHER ]........................'Schuhmacher' #20503290
+||   |       |       +--------[ SPENGLER ]...........................'Spengler' #20503300
+||   |       |       +--------[ STEINMETZ ]..........................'Steinmetz' #20503310
+||   |       |       +--------[ STUKATEUR ]..........................'Stuckateur' #20503320
+||   |       |       +--------[ TISCHLER ]...........................'Tischler' #20503330
+||   |       |       +--------[ TOEPFER ]............................'Töpfer' #20503340
+||   |       |       +--------[ UHRMACHER ]..........................'Uhrmacher' #20503350
+||   |       |               
+||   |       +-------+[ COMMERCIAL_AREA ]....................'Einkaufsbereich mit Mehrfachnutzung (unspezifiziert)' #20504000
+||   |       |       +----[ KAUFHAUS ]...........................'Kaufhaus' #20504100
+||   |       |       +----[ EINKAUFSCENTER ].....................'Einfaufscenter' #20504200
+||   |       |       +----[ MARKTPLATZ ].........................'Marktplatz' #20504300
+||   |       |           
+||   |       +-------+[ DIENSTLEISTUNG_AUTO ]................'Dienstleistung Auto (unspezifiziert)' #20505000
+||   |       |       +----[ AUTOHAUS ]...........................'Autohaus mit mehreren Dienstleistungen' #20505100
+||   |       |       +----[ AUTOHAENDLER ].......................'Autohändler' #20505200
+||   |       |       +----[ GEBRAUCHTWAGENHAENDLER ].............'Gebrauchtwagenhändler' #20505300
+||   |       |       +----[ AUTOREPERATUR ]......................'Autoreparatur' #20505400
+||   |       |       +----[ AUTOVERMIETUNG ].....................'Autovermietung' #20505500
+||   |       |       +----[ TANKSTELLE ].........................'Tankstelle' #20505600
+||   |       |       +----[ WASCHANLAGE ]........................'Waschanlage' #20505700
+||   |       |           
+||   |       +-------+[ FINANZEINRICHTUNG ]..................'Finanzeinrichtung (unspezifiziert)' #20506000
+||   |       |       +----[ BANK_KREDITUNTERNEHMEN ].............'Bank (Kreditunternehmen)' #20506100
+||   |       |       +----[ GELDAUTOMAT ]........................'Geldautomat' #20506200
+||   |       |       +----[ GELDWECHSELN ].......................'Geldwechseln' #20506300
+||   |       |       +----[ BOERSE ].............................'Börse' #20506400
+||   |       |           
+||   |       +-------+[ RECHTSWESEN ]........................'Rechtswesen (unspezifiziert)' #20507000
+||   |       |       +----[ RECHTSANWALT ].......................'Rechtsanwalt' #20507100
+||   |       |       +----[ STEUERBERATER ]......................'Steuerberater' #20507200
+||   |       |           
+||   |       +-------+[ POST ]...............................'Post (unspezifiziert)' #20508000
+||   |       |       +----[ POST_FILIALE ].......................'Post-Filiale' #20508100
+||   |       |       +----[ PACKET_ABHOLSTATION ]................'Packet-Abholstation' #20508200
+||   |       |       +----[ BRIEFKASTEN ]........................'Briefkasten' #20508300
+||   |       |           
+||   |       +-------+[ COMMUNICATION ]......................'Netzwerkabdeckungsfläche (unspezifiziert)' #20509000
+||   |       |       +---+[ WLAN_CELL ]..........................'WLAN-Zelle (unspezifiziert)' #20509100
+||   |       |       |   +----[ WLAN_HOTSPOT_FREE ]..................'WLAN-Hotspot (frei)' #20509110
+||   |       |       |   +----[ WLAN_HOTSPOT_PAID ]..................'WLAN-Hotspot (bezahlt)' #20509120
+||   |       |       |       
+||   |       |       +---+[ CELL_PHONE_CELL ]....................'Mobilfunkzelle (unspezifiziert)' #20509200
+||   |       |       |   +----[ GSM_CELL ]...........................'GSM-Funkzelle' #20509210
+||   |       |       |   +----[ UMTS_CELL ]..........................'UMTS-Funkzelle' #20509220
+||   |       |       |   +----[ LTE_CELL ]...........................'LTE-Funkzelle' #20509230
+||   |       |       |       
+||   |       |       +----[ NETZWERKHAUPTVERTEILER ].............'Netzwerkhauptverteiler' #20509300
+||   |       |       +----[ ANTENNE ]............................'Antenne' #20509400
+||   |       |       +----[ KOMMUNIKATIONSTURM ].................'Funkturm' #20509500
+||   |       |           
+||   |       +--------[ TOILETS ]............................'Toiletten' #20510000
+||   |       +--------[ WERBUNG ]............................'Werbung' #20511000
+||   |       |       
+||   |       +-------+[ SCHULUNG_KOMMERZIELL ]...............'Kommerzielle Schulung (unspezifiziert)' #20512000
+||   |       |       +----[ FAHRSCHULE ].........................'Fahrschule' #20512100
+||   |       |       +----[ TANZSCHULE ].........................'Tanzschule' #20512200
+||   |       |           
+||   |       +-------+[ UNTERHALTUNG_KOMMERZIELL ]...........'Kommerzielle Nutzung Unterhaltung (unspezifiziert)' #20513000
+||   |       |       +----[ SPIELE_ARKADE ]......................'Spiele-Arkade' #20513100
+||   |       |       +----[ EISBAHN ]............................'Eisbahn' #20513200
+||   |       |       +----[ CASINO ].............................'Casino' #20513300
+||   |       |           
+||   |       +-------+[ NACHTLEBEN ].........................'Nachtleben (unspezifiziert)' #20514000
+||   |       |       +----[ NACHTCLUB ]..........................'Nachtclub' #20514100
+||   |       |       +----[ SWINGERCLUB ]........................'Swingerclub' #20514200
+||   |       |       +----[ BORDELL ]............................'Bordell' #20514300
+||   |       |           
+||   |       +-------+[ WEITERE_DIENSTLEISTUNGEN ]...........'Weitere Dienstleistung (unspezifiziert)' #20515000
+||   |       |       +----[ FRISOER ]............................'Frisör' #20515100
+||   |       |       +----[ FUSSPFLEGE ].........................'Fußpflege' #20515200
+||   |       |       +----[ REINIGUNG ]..........................'Reinigung' #20515300
+||   |       |       +----[ WAESCHEREI ].........................'Wäscherei' #20515400
+||   |       |       +----[ VIDEOVERLEIH ].......................'Videoverleih' #20515500
+||   |       |       +----[ OPTIKER ]............................'Optiker' #20515600
+||   |       |       +----[ REISEBUERO ].........................'Reisebüro' #20515700
+||   |       |       +----[ VERSICHERUNGSAGENTUR ]...............'Versicherungsagentur' #20515800
+||   |       |           
+||   |       +-------+[ UEBERNACHTUNGEN_UND_TOURISMUS ]......'Übernachtungswesen und Tourismus (unspezifiziert)' #20516000
+||   |               +---+[ UEBERNACHTUNGEN ]....................'Übernachtung' #20516100
+||   |               |   +----[ HOTEL ]..............................'Hotel' #20516110
+||   |               |   +----[ HOSTEL ].............................'Hostel' #20516120
+||   |               |   +----[ PENSION ]............................'Pension' #20516130
+||   |               |   +----[ FERIENHAUS ].........................'Ferienhaus' #20516140
+||   |               |   +----[ ALPHENHUETTE ].......................'Alpenhütte' #20516150
+||   |               |   +----[ MOTEL ]..............................'Motel' #20516160
+||   |               |   +----[ WOHNHEIM ]...........................'Wohnheim' #20516170
+||   |               |       
+||   |               +---+[ TOURIST_INFO ].......................'Tourist-Info' #20516200
+||   |                   +----[ TOURIST_OFFICE ].....................'Tourist-Büro' #20516210
+||   |                   |   
+||   |                   +---+[ TOURIST_BESCHILDERUNG ]..............'Tourist-Schild' #20516220
+||   |                       +----[ TOURIST_KARTE ]......................'Wanderkarte' #20516221
+||   |                       +----[ TOURIST_BESCHILDERUNG_WANDERWEG ]....'Wanderschild' #20516222
+||   |                       +----[ TOURIST_BESCHILDERUNG_FAHRRADWEG ]...'Fahrradschild' #20516223
+||   |                       +----[ TOURIST_BESCHILDERUNG_FAHRRAD_UND_WANDER_WEG ]'Wegschild' #20516224
+||   |                           
+||   +-------+[ BEHOERDE ]...........................'Behörde (unspezifiziert)' #20600000
+||   |       +---+[ BEHOERDE_NATIONAL ]..................'Nationale Behörde (unspezifiziert)' #20610000
+||   |       |   +----[ RATHAUS ]............................'Rathaus' #20611000
+||   |       |   |   
+||   |       |   +---+[ AMT ]................................'Amt (unspezifiziert)' #20612000
+||   |       |       +----[ FINANZAMT ]..........................'Finanzamt' #20612100
+||   |       |       +----[ STANDESAMT ].........................'Standesamt' #20612200
+||   |       |       +----[ FORSTAMT ]...........................'Forstamt' #20612300
+||   |       |       +----[ GERICHT ]............................'Gericht' #20612400
+||   |       |       +----[ JOBCENTRE ]..........................'Job-Centre' #20612500
+||   |       |           
+||   |       +---+[ BEHOERDE_INTERNATIONAL ].............'Internationale Behörde (unspezifiziert)' #20620000
+||   |           +----[ BOTSCHAFT ]..........................'Botschaft' #20621000
+||   |           +----[ KONSULAT ]...........................'Konsulat' #20622000
+||   |               
+||   +-------+[ MEDICAL ]............................'Medizinische Nutzung (unspezifiziert)' #20700000
+||   |       +---+[ KRANKENHAUS ]........................'Krankenhaus (unspezifiziert)' #20710000
+||   |       |   +----[ KRANKENHAUS_ALLGEMEIN ]..............'Allgemeines Krankenhaus' #20711000
+||   |       |   +----[ HEILQUELLE ].........................'Heilquelle' #20712000
+||   |       |       
+||   |       +----[ MEDIZINISCHE_BERATUNG ]..............'Medizinische Beratungsstelle' #20720000
+||   |       +----[ HEBAMME ]............................'Hebamme' #20730000
+||   |       +----[ APOTHEKE ]...........................'Apotheke' #20740000
+||   |       |   
+||   |       +---+[ ARZTPRAXIS ].........................'Arztpraxis (unspezifiziert)' #20750000
+||   |           +----[ ARZTPRAXIS_ALLGEMEINMEDIZIN ]........'Arztpraxis Allgmeinemedizin' #20751000
+||   |           +----[ ARZTPRAXIS_HNO ].....................'Arztpraxis HNO' #20752000
+||   |           +----[ ARZTPRAXIS_AUGEN ]...................'Arztpraxis Augenheilkunde' #20753000
+||   |           +----[ ARZTPRAXIS_ORTHOPAEDIE ].............'Arztpraxis Ortopädie' #20754000
+||   |           +----[ ARZTPRAXIS_KINDERHEILKUNDE ].........'Kinderarzt' #20755000
+||   |           +----[ ARZTPRAXIS_ZAHNARZT ]................'Arztpraxis Zahnarzt' #20756000
+||   |           +----[ ARZTPRAXIS_TIERARZT ]................'Arztpraxis Tierarzt' #20757000
+||   |               
+||   +-------+[ SOCIAL_RELIGIOES ]...................'Soziale oder religiöse Einrichtung (unspezifiziert)' #20800000
+||   |       +---+[ BETREUUNG_KINDER ]...................'Betreuende Einrichtung für Kinder (unspezifiziert)' #20810000
+||   |       |   +----[ KINDERGARTEN ].......................'Kindergarten' #20811000
+||   |       |   +----[ KINDERHEIM ].........................'Kinderheim' #20812000
+||   |       |       
+||   |       +----[ ALTENHEIM ]..........................'Altenheim' #20820000
+||   |       |   
+||   |       +---+[ KIRCHLICH ]..........................'Kirchliche Einrichtung (unspezifiziert)' #20830000
+||   |       |   +----[ KIRCHE ].............................'Kirche' #20831000
+||   |       |   +----[ KATHEDRALE ].........................'Kathedrale' #20832000
+||   |       |   +----[ KAPELLE ]............................'Kapelle' #20833000
+||   |       |   +----[ WEGEKREUZ ]..........................'Wegekreuz' #20834000
+||   |       |   +----[ KLOSTER ]............................'Kloster' #20835000
+||   |       |   +----[ KREMATORIUM ]........................'Krematorium' #20836000
+||   |       |       
+||   |       +---+[ GEMEINWESEN ]........................'Gemeinwesen (unspezifiziert)' #20840000
+||   |           +----[ GEMEINSCHAFTSZENTRUM ]...............'Gemeinschaftszentrum' #20841000
+||   |           +----[ SOZIALZENTRUM ]......................'Sozialzentrum' #20842000
+||   |           +----[ JUGENDZENTRUM ]......................'Jugendzentrum' #20843000
+||   |               
+||   +-------+[ FREIZEIT ]...........................'Freizeit (unspezifiziert)' #20900000
+||   |       +---+[ UNTERHALTUNGSGEBAEUDE ]..............'Unterhaltungsgebäude (unspezifiziert)' #20910000
+||   |       |   +----[ KINO ]...............................'Kino' #20911000
+||   |       |   +----[ THEATER ]............................'Theater' #20912000
+||   |       |   +----[ KONZERTHAUS ]........................'Konzerthaus' #20913000
+||   |       |       
+||   |       +---+[ MUSEUM_ALL ].........................'Museum und Austellung (unspezifiziert)' #20920000
+||   |       |   +----[ MUSEUM ].............................'Museum' #20921000
+||   |       |   +----[ KUNSTZENTRUM ].......................'Kunstzentrum' #20922000
+||   |       |       
+||   |       +---+[ TIERPARK ]...........................'Tierpark (unspezifiziert)' #20930000
+||   |       |   +----[ ZOO ]................................'Zoo' #20931000
+||   |       |   +----[ AQUARIUM ]...........................'Aquarium' #20932000
+||   |       |       
+||   |       +---+[ FREIZEIPARK ]........................'Freizeitpark (unspezifiziert)' #20940000
+||   |           +----[ THEMENPARK ].........................'Themenpark' #20941000
+||   |           +----[ WASSERPARK ].........................'Wasserpark' #20942000
+||   |               
+||   +-------+[ LAENDLICH ]..........................'Ländliche Fläche (unspezifiziert)' #21000000
+||   |       +----[ LANDWIRTSCHAFTLICHER_HOF ]...........'Landwirtschaftlicher Hof' #21010000
+||   |       +----[ REITER_HOF ].........................'Reiterhof' #21020000
+||   |       +----[ SCHREBERGAERTEN ]....................'Schrebergärten' #21030000
+||   |       +----[ BIENENSTOCK ]........................'Bienenstock' #21040000
+||   |       +----[ HOCHSITZ ]...........................'Hochsitz' #21050000
+||   |           
+||   +--------[ BUEROGEBAEUDE ]......................'Bürogebäude' #21100000
+||   +--------[ UNBENUTZT ]..........................'Unbenutztes Objekt' #21200000
+||           
+[]===+[ OPENAREA ]...........................'Offene Fläche (unspezifiziert)' #30000000
+||   +---+[ PUBLIC_PLACE ].......................'Öffentlicher Platz (unspezifiziert)' #31000000
+||   |   +---+[ GENERAL_PUBLIC_PLACE ]...............'Allgemeiner öffentlicher Platz (unspezifiziert)' #31100000
+||   |   |   +---+[ PARK ]...............................'Park' #31110000
+||   |   |   |   +----[ GARTEN ].............................'Garten' #31111000
+||   |   |   |   +----[ PICNIC_PLATZ ].......................'Picnic-Platz' #31112000
+||   |   |   |   +----[ GRILLSTELLE ]........................'Grillstelle' #31113000
+||   |   |   |       
+||   |   |   +----[ HUNDEPARK ]..........................'Hundepark' #31120000
+||   |   |   +----[ SPIELPLATZ ].........................'Spielplatz' #31130000
+||   |   |   +----[ CAMPINGPLATZ ].......................'Campingplatz' #31140000
+||   |   |   +----[ CARAVAN_PLATZ ]......................'Caravan-Abstellplatz' #31150000
+||   |   |   |   
+||   |   |   +---+[ AUSSICHTSPUNKT ].....................'Aussichtspunkt' #31160000
+||   |   |   |   +----[ AUSSICHTSGEBAUEDE ]..................'Aussichtsgebäude' #31161000
+||   |   |   |   +----[ AUSSICHTSTURM ]......................'Aussichtsturm' #31162000
+||   |   |   |       
+||   |   |   +----[ NAHERHOLUNGSGEBIET ].................'Naherholungsgebiet' #31170000
+||   |   |   +----[ GRUENFLAECHE ].......................'Grünfläche' #31180000
+||   |   |       
+||   |   +----[ FRIEDHOF ]...........................'Friedhof' #31200000
+||   |   +----[ FRIEDHOF_HISTORISCH ]................'Gedenkfriedhof' #31300000
+||   |   |   
+||   |   +---+[ SPORTS_PLACE ].......................'Platz mit sportlicher Nutzung (unspezifiziert)' #31400000
+||   |   |   +--------[ STADION ]............................'Stadion' #31401000
+||   |   |   +--------[ SPORTPLATZ ].........................'Sportplatz' #31402000
+||   |   |   +--------[ SPORTZENTRUM ].......................'Sportzentrum' #31403000
+||   |   |   +--------[ TENNISPLATZ ]........................'Tennisplatz' #31404000
+||   |   |   |       
+||   |   |   +-------+[ REITEN ].............................'Reiten' #31405000
+||   |   |   |       +----[ REITHALLE ]..........................'Reithalle' #31405100
+||   |   |   |       +----[ REITPLATZ ]..........................'Reitplatz' #31405200
+||   |   |   |           
+||   |   |   +-------+[ FUSSBALL ]...........................'Fußball' #31406000
+||   |   |   |       +----[ FUSSBALLPLATZ ]......................'Fußballplatz' #31406100
+||   |   |   |       +----[ FUSSBALLSTADION ]....................'Fußballstadion' #31406200
+||   |   |   |           
+||   |   |   +--------[ MODELLFLUG ].........................'Modellflug' #31407000
+||   |   |   +--------[ DOGTRAINING ]........................'Hundetraining' #31408000
+||   |   |   +--------[ DOGRACING ]..........................'Hunderennen' #31409000
+||   |   |   +--------[ BOGENSCHIESSEN ].....................'Bogenschießen' #31410000
+||   |   |   +--------[ SKATING ]............................'Skating' #31411000
+||   |   |   +--------[ HANDBALL ]...........................'Handballball' #31412000
+||   |   |   +--------[ BEACHVOLLEYBALL ]....................'Beachvolleyball' #31413000
+||   |   |   +--------[ FAHRRADFAHREN ]......................'Fahrradfahren' #31414000
+||   |   |   +--------[ KARATE ].............................'Karate' #31415000
+||   |   |   +--------[ RUDERN ].............................'Rundern' #31416000
+||   |   |   +--------[ TANZEN ].............................'Tanzen' #31417000
+||   |   |   +--------[ MINIGOLF ]...........................'Minigolf' #31418000
+||   |   |   +--------[ TISCHTENNIS ]........................'Tischtennis' #31419000
+||   |   |   +--------[ BOULE ]..............................'Boule' #31420000
+||   |   |   +--------[ BOWLING ]............................'Bowling' #31421000
+||   |   |   +--------[ BASKETBALL_FELD ]....................'Basketballfeld' #31422000
+||   |   |   +--------[ ATHLETICS_FELD ].....................'Leichtathletikfeld' #31423000
+||   |   |   +--------[ SCHIESSSTAND ].......................'Schießstand' #31424000
+||   |   |   +--------[ SCHLITTENSTRECKE ]...................'Schlittenstrecke' #31425000
+||   |   |   |       
+||   |   |   +-------+[ GOLFPLATZ ]..........................'Golfplatz' #31426000
+||   |   |   |       +----[ GOLFPLATZ_BUNKER ]...................'Golfplatzbunker' #31426100
+||   |   |   |           
+||   |   |   +--------[ RENNBAHN ]...........................'Rennbahn' #31427000
+||   |   |   +--------[ KLETTERN ]...........................'Klettern' #31428000
+||   |   |           
+||   |   +---+[ SCHWIMMBAD_ALL ].....................'Schwimmbad (unspezifiziert)' #31500000
+||   |   |   +----[ SPRUNGTURM ].........................'Sprungturm' #31510000
+||   |   |   +----[ SWIMMING_POOL ]......................'Swimming Pool' #31520000
+||   |   |   +----[ FREIBAD ]............................'Schwimmbad (Freibad)' #31530000
+||   |   |   +----[ NATURFREIBAD ].......................'Schwimmbad (Naturfreibad)' #31540000
+||   |   |   +----[ HALLENBAD ]..........................'Schwimmbad (Hallenbad)' #31550000
+||   |   |       
+||   |   +---+[ MESSEEINRICHTUNG ]...................'Messeeinrichtung (unspezifiziert)' #31600000
+||   |   |   +----[ AUSSTELLUNGSHALLE ]..................'Messeeinrichtung (unspezifiziert)' #31610000
+||   |   |   +----[ MESSEZENTRUM ].......................'Messezentrum' #31620000
+||   |   |       
+||   |   +---+[ WERTSTOFFSAMMELSTELLE ]..............'Wertstoffsammelstelle (unspezifiziert)' #31700000
+||   |       +----[ WERTSTOFFSAMMELZENTRUM ].............'Wertstoffsammelzentrum' #31710000
+||   |       +----[ ALTGLASBEHAELTER ]...................'Altglassammelbehälter' #31720000
+||   |       +----[ ALTPAPIERBEHAELTER ].................'Altpapiersammelbehälter' #31730000
+||   |       +----[ ALTKLEIDERBEHAELTER ]................'Altkleidersammelbehälter' #31740000
+||   |       +----[ ALTGLASSAMMELSTELLE ]................'Altglassammelstelle' #31750000
+||   |       +----[ ALTPAPIERSAMMELSTELLE ]..............'Altpapiersammelstelle' #31760000
+||   |       +----[ ALTKLEIDESAMMELSTELLE ]..............'Altkleidersammelstelle' #31770000
+||   |       +----[ DOSENAMMELSTELLE ]...................'Dosensammelstelle' #31780000
+||   |           
+||   +---+[ TRAFFIC_PLACE ]......................'Ort mit Verkehrsbedeutung (unspezifiziert)' #32000000
+||   |   +---+[ RUHENDER_VERKEHR ]...................'Ruhender Verkehr (unspezifiziert)' #32100000
+||   |   |   +---+[ ALLGEMEINER_PARKPLATZ ]..............'Allgemeiner Parkplatz (unspezifiziert)' #32110000
+||   |   |   |   +----[ OEFFENTLICHER_PARKPLATZ ]............'Öffentlicher Parkplatz' #32111000
+||   |   |   |   +----[ PARKPLATZ_EINGESCHRAENKT ]...........'Parkplatz für eingeschränkten Nutzerkreis' #32112000
+||   |   |   |   +----[ PARKPLATZ_PRIVAT ]...................'Privatparkplatz' #32113000
+||   |   |   |   +----[ PARKBUCHT ]..........................'Parkbucht' #32114000
+||   |   |   |   +----[ TAXISTAND ]..........................'Taxistand' #32115000
+||   |   |   |   +----[ FAHRRADPARKPLATZ ]...................'Fahrradparkplatz' #32116000
+||   |   |   |   +----[ FAHRRADPARKPLATZ_GEBAEUDE ]..........'Fahrradparkplatz (Gebäude)' #32117000
+||   |   |   |   +----[ CARSHARING ].........................'Carsharing-Parkplatz' #32118000
+||   |   |   |       
+||   |   |   +----[ RASTSTAETTE ]........................'Raststätte' #32120000
+||   |   |   +----[ RASTPLATZ ]..........................'Rastplatz' #32130000
+||   |   |   |   
+||   |   |   +---+[ PARKHAUS ]...........................'Parkhaus' #32140000
+||   |   |       +----[ PARKHAUS_OEFFENTLICH ]...............'Parkhaus' #32141000
+||   |   |       +----[ PARKHAUS_EINGESCHRAENKT ]............'Parkhaus' #32142000
+||   |   |       +----[ PARKHAUS_PRIVAT ]....................'Parkhaus' #32143000
+||   |   |           
+||   |   +---+[ BAHNHOF ]............................'Bahnhof (unspezifiziert)' #32200000
+||   |   |   +----[ BAHNSTEIG ]..........................'Bahnsteig' #32210000
+||   |   |       
+||   |   +----[ BAHNHOF_UNBENUTZT ]..................'Bahnhof (unbenutzt)' #32300000
+||   |   |   
+||   |   +---+[ HALTESTELLE ]........................'Haltestelle (unspezifiziert)' #32400000
+||   |   |   +----[ BUSBAHNHOF ].........................'Busbahnhof' #32410000
+||   |   |   +----[ BUSHALTESTELLE ].....................'Bushaltestelle' #32420000
+||   |   |   +----[ U_BAHN_HALTESTELLE ].................'U-Bahn Haltestelle' #32430000
+||   |   |   +----[ TRAM_HALTESTELLE ]...................'Tram Haltestelle' #32440000
+||   |   |       
+||   |   +---+[ FLUGHAFEN ]..........................'Flughafen (unspezifiziert)' #32500000
+||   |   |   +----[ HUBSCHRAUBER_LANDEPLATZ ]............'Hubschrauberlandeplatz' #32510000
+||   |   |   +----[ ROLLBAHN ]...........................'Rollbahn' #32520000
+||   |   |   +----[ VORFELD ]............................'Vorfeld' #32530000
+||   |   |       
+||   |   +---+[ SCHIFFFAHRTSVERKEHR ]................'Schifffahrtsverkehr (unspezifiziert)' #32600000
+||   |   |   +-------+[ HAFEN_ALL ]..........................'Hafen (unspezifiziert)' #32601000
+||   |   |   |       +----[ HAFEN_PERSONEN ].....................'Hafen (Personenverkehr)' #32601100
+||   |   |   |       +----[ HAFEN_SPORTBOOTE ]...................'Hafen (Sportboot)' #32601200
+||   |   |   |       +----[ HAFEN_GUETER ].......................'Hafen (Güterverkehr)' #32601300
+||   |   |   |       +----[ FAEHRTERMINAL ]......................'Fährterminal' #32601400
+||   |   |   |           
+||   |   |   +--------[ SLIPANLAGE ].........................'Slipanlage' #32602000
+||   |   |   +--------[ PIER ]...............................'Pier' #32603000
+||   |   |   +--------[ DOCK ]...............................'Dock' #32604000
+||   |   |   +--------[ SCHLEUSE ]...........................'Schleuse' #32605000
+||   |   |   +--------[ WEHR ]...............................'Wehr' #32606000
+||   |   |   |       
+||   |   |   +-------+[ SCHIFFFAHRTSLINIE_ALL ]..............'Schifffahrtslinie (unspezifiziert)' #32607000
+||   |   |   |       +----[ SCHIFFFAHRTSLINIE ]..................'Schifffahrtslinie' #32607100
+||   |   |   |       +----[ SCHIFFFAHRT_WENDEPUNKT ].............'Wendepunkt Schifffahrt' #32607200
+||   |   |   |           
+||   |   |   +--------[ SCHIFFFAHRT_ZEICHEN ]................'Schifffahrtzeichen' #32608000
+||   |   |   +--------[ BOOTSVERLEIH ].......................'Bootsverleih' #32609000
+||   |   |   |       
+||   |   |   +-------+[ SIGNALEINRICHTUNGEN ]................'Schifffahrt-Signaleinrichtungen' #32610000
+||   |   |           +----[ BOJE ]...............................'Boje' #32610100
+||   |   |           +----[ LEUCHTTURM ].........................'Leuchtturm' #32610200
+||   |   |           |   
+||   |   |           +---+[ SEEZEICHEN ].........................'Seezeichen' #32610300
+||   |   |               +---+[ ANKERPLATZ ].........................'Ankerplatz' #32610310
+||   |   |               |   +----[ DOLBEN ].............................'Dolben' #32610311
+||   |   |               |       
+||   |   |               +----[ SEEZEICHEN_NOTIZ ]...................'Seezeichennotiz' #32610320
+||   |   |               +----[ BUOY_LATERAL ].......................'Lateralboje' #32610330
+||   |   |               +----[ BUOY_LATERAL_PORT ]..................'Lateralportboje' #32610340
+||   |   |               +----[ BUOY_LATERAL_STARBOARD ].............'Lateralstarboardboje' #32610350
+||   |   |                   
+||   |   +---+[ TRAFFIC_MORE ].......................'Weiteres Objekt mit Verkehrsbedeutung (unspezifiziert)' #32700000
+||   |   |   +---+[ WEGENETZE ]..........................'Bestandteil von Wegenetzen (unspezifiziert)' #32710000
+||   |   |   |   +--------[ WENDEHAMMER ]........................'Wendehammer' #32710100
+||   |   |   |   +--------[ MINIKREISEL ]........................'Minikreisel' #32710200
+||   |   |   |   +--------[ STEIGUNG ]...........................'Steigung' #32710300
+||   |   |   |   +--------[ POLLER ].............................'Poller' #32710400
+||   |   |   |   +--------[ FAHRRAD_BARRIERE ]...................'Fahrrad-Barriere' #32710500
+||   |   |   |   +--------[ BLOCK ]..............................'Block' #32710600
+||   |   |   |   +--------[ BAUMBARRIERE ].......................'Baum-Barriere' #32710700
+||   |   |   |   |       
+||   |   |   |   +-------+[ BERUHIGUNGSMASSNAHME ]...............'Beruhigungsmaßnahme' #32710800
+||   |   |   |   |       +----[ BODENWELLE ].........................'Bodenwelle' #32710810
+||   |   |   |   |       +----[ FAHRBAHNVERENGUNG ]..................'Fahrbahnverengung' #32710820
+||   |   |   |   |       +----[ FAHRBAHNSCHIKANE ]...................'Fahrbahnschikane' #32710830
+||   |   |   |   |           
+||   |   |   |   +--------[ FURT ]...............................'Furt' #32710900
+||   |   |   |   +--------[ BAUSTELLE_VERKEHR ]..................'Baustelle (Verkehr)' #32711000
+||   |   |   |   +--------[ RETTUNGSPUNKT ]......................'Rettungspunkt' #32711100
+||   |   |   |           
+||   |   |   +----[ UNBENUTZTE_STRASSEN ]................'Straße (unbenutzt)' #32720000
+||   |   |   |   
+||   |   |   +---+[ PUNKT_OBJEKT_WEG ]...................'Punkt-Objekt eines Weges (unspezifiziert)' #32730000
+||   |   |   |   +--------[ FELD_WALD_WEG_PUNKT ]................'Feld- und Waldweg (Punkt)' #32730100
+||   |   |   |   +--------[ FAHRRAD_FUSS_WEG_PUNKT ].............'Fahrrad- und Fußweg (Punkt)' #32730200
+||   |   |   |   +--------[ FAHRRADWEG_PUNKT ]...................'Fahrradweg (Punkt, unspezifiziert)' #32730300
+||   |   |   |   +--------[ FUSSWEG_PUNKT ]......................'Fußweg (Punkt)' #32730400
+||   |   |   |   +--------[ PFAD_WANDERWEG_PUNKT ]...............'Pfad oder Wanderweg (Punkt)' #32730500
+||   |   |   |   +--------[ ANSCHLUSSSTELLE_AUTOBAHN_PUNKT ].....'Anschlussstelle (Punkt, Autobahn)' #32730600
+||   |   |   |   +--------[ ANSCHLUSSSTELLE_KRAFTFAHRSTRASSE_PUNKT ]'Anschlussstelle (Punkt, Kraftfahrstraße)' #32730700
+||   |   |   |   +--------[ ANSCHLUSSSTELLE_BUNDESSTRASSE_PUNKT ]'Anschlussstelle (Punkt, Bundesstraße)' #32730800
+||   |   |   |   +--------[ ANSCHLUSSSTELLE_SEKUNDAER_PUNKT ]....'Anschlussstelle (Punkt, sekundär)' #32730900
+||   |   |   |   |       
+||   |   |   |   +-------+[ ERSCHLIESSUNGSWEG_PUNKT ]............'Erschließungsweg (Punkt)' #32731000
+||   |   |   |           +----[ ZUFAHRT_PUNKT ]......................'Zufahrt (Punkt)' #32731010
+||   |   |   |           +----[ PARKPLATZWEG_PUNKT ].................'Parkplatzweg (Punkt)' #32731020
+||   |   |   |               
+||   |   |   +---+[ SIGNALE_SCHILDER_MESSEINRICHTUNGEN ].'Verkehrsignale,Schilder und Messeinrichtungen (unspezifiziert)' #32740000
+||   |   |   |   +----[ VERKEHRSSIGNAL ].....................'Verkehrssignal' #32741000
+||   |   |   |   +----[ KREUZUNGSSIGNAL ]....................'Kreuzungssignal' #32742000
+||   |   |   |   +----[ BLITZKASTEN ]........................'Blitzkasten' #32743000
+||   |   |   |   |   
+||   |   |   |   +---+[ VERKEHRSSCHILD ].....................'Verkehrsschild' #32744000
+||   |   |   |   |   +----[ STOPSCHILD ].........................'Stopschild' #32744100
+||   |   |   |   |   +----[ VORFAHRTGEWAEHREN ]..................'Vorfahrtgewähren' #32744200
+||   |   |   |   |   +----[ MAXIMALGESCHWINDIGKEITSSCHILD ]......'Maximalgeschwindigkeitsschild' #32744300
+||   |   |   |   |   +----[ ORTSSCHILD ].........................'Ortsschild' #32744400
+||   |   |   |   |   +----[ ZIELSCHILD ].........................'Zielschild' #32744500
+||   |   |   |   |       
+||   |   |   |   +----[ WASSER_OEL_GAS_MARKIERUNG ]..........'Straßeneinbautenschild' #32745000
+||   |   |   |       
+||   |   |   +----[ STRASSENLAMPE ]......................'Straßenlampe' #32750000
+||   |   |   |   
+||   |   |   +---+[ TRAFFIC_PROPERTIES ].................'Verkehrseigenschaften' #32760000
+||   |   |       +----[ BRIDGE ].............................'Brücke' #32761000
+||   |   |       +----[ BRIDGE_RELATION ]....................'Brücke (Relation)' #32762000
+||   |   |       +----[ STREET_RELATION ]....................'Straße (Relation)' #32763000
+||   |   |       +----[ TURN_ALLOWED ].......................'Erlaubte Abbiegung' #32764000
+||   |   |       +----[ TURN_RESTRICTION ]...................'Abbiegerestriktion' #32765000
+||   |   |       +----[ TMC_RELATION ].......................'TMC (Relation)' #32766000
+||   |   |       +----[ NOEXIT ].............................'Kein Ausgang' #32767000
+||   |   |       +----[ HASEXIT ]............................'Existenter Ausgang' #32768000
+||   |   |           
+||   |   +---+[ BAHNVERKEHR ]........................'Bahnverkehr (unspezifiziert)' #32800000
+||   |   |   +----[ BAHNKONTROLLZENTRUM ]................'Bahnkontrollzentrum' #32810000
+||   |   |   |   
+||   |   |   +---+[ GLEISKOERPER ].......................'Gleiskörper' #32820000
+||   |   |   |   +----[ GLEISKOERPER_UNBENUTZT ].............'Gleiskörper unbenutzt' #32821000
+||   |   |   |   +----[ GLEISKOERPER_DEMONTIERT ]............'Gleiskörper demontiert' #32822000
+||   |   |   |   +----[ RANGIERBEREICH ].....................'Rangierbereich' #32823000
+||   |   |   |   +----[ ANLIEFERUNGSGLEIS ]..................'Anlieferungsgleis' #32824000
+||   |   |   |   |   
+||   |   |   |   +---+[ TRAM_GLEISE ]........................'Gleiskörper Tram' #32825000
+||   |   |   |   |   +----[ TRAM_RANGIERBEREICH ]................'Rangierbereich Tram' #32825100
+||   |   |   |   |       
+||   |   |   |   +----[ UBAHN_GLEISE ].......................'Gleiskörper U-Bahn' #32826000
+||   |   |   |   +----[ MONORAIL ]...........................'Monorail' #32827000
+||   |   |   |       
+||   |   |   +----[ BAHNEUBERGANG ]......................'Bahnübergang' #32830000
+||   |   |   +----[ DREHSCHEIBE ]........................'Drehscheibe' #32840000
+||   |   |   +----[ BAUSTELLE_BAHNVERKEHR ]..............'Baustelle (Bahnverkehr)' #32850000
+||   |   |   +----[ BAHNVERKEHR_HISTORISCH ].............'Bahnverkehr (historisch)' #32860000
+||   |   |   +----[ PUFFERSTOP ].........................'Pufferstop' #32870000
+||   |   |   +----[ WEICHE ].............................'Weiche' #32880000
+||   |   |       
+||   |   +---+[ SEILBAHN_ALL ].......................'Seilbahn' #32900000
+||   |       +----[ SEILBAHN ]...........................'Seilbahn' #32910000
+||   |       +----[ SESSELLIFT ].........................'Sessellift' #32920000
+||   |       +----[ SCHLEPPLIFT ]........................'Schlepplift' #32930000
+||   |           
+||   +----[ MUELLDEPONIE ].......................'Mülldeponie' #33000000
+||   |   
+||   +---+[ STRASSEN_WEGE ]......................'Straße oder Weg (unspezifiziert)' #34000000
+||       +---+[ KRAFTFAHRZEUGSTRASSEN ]..............'Kraftfahrzeugstraßen (unspezifiziert)' #34100000
+||       |   +----[ AUTOBAHN ]...........................'Autobahn' #34110000
+||       |   +----[ KRAFTFAHRSTRASSE ]...................'Kraftfahrstraße' #34120000
+||       |   |   
+||       |   +---+[ LANDSTRASSE ]........................'Landstraße (unspezifiziert)' #34130000
+||       |   |   +----[ BUNDESSTRASSE ]......................'Bundesstraße' #34131000
+||       |   |   +----[ LANDSTRASSE_SEKUNDAER ]..............'Landstraße (sekundär)' #34132000
+||       |   |   +----[ LANDSTRASSE_TERTIAER ]...............'Landstraße (tertiär)' #34133000
+||       |   |   +----[ LANDSTRASSE_UNKLASSIFIZIERT ]........'Landstraße (unklassifiziert)' #34134000
+||       |   |       
+||       |   +---+[ INNERORTSTRASSE_ALL ]................'Innerortstraße (unspezifiziert)' #34140000
+||       |   |   +----[ INNERORTSTRASSE ]....................'Innerortstraße' #34141000
+||       |   |   +----[ VERKEHRSBERUHIGTER_BEREICH ].........'Verkehrsberuhigter Bereich' #34142000
+||       |   |   |   
+||       |   |   +---+[ ERSCHLIESSUNGSWEG ]..................'Erschließungsweg' #34143000
+||       |   |       +----[ ZUFAHRT ]............................'Zufahrt' #34143100
+||       |   |       +----[ PARKPLATZWEG ].......................'Parkplatzweg' #34143200
+||       |   |           
+||       |   +----[ FELD_WALD_WEG ]......................'Feld- und Waldweg' #34150000
+||       |   +----[ FELD_WALD_WEG_HISTORISCH ]...........'Feld- und Waldweg (historisch)' #34160000
+||       |   |   
+||       |   +---+[ KREUZUNGEN_KREISEL_AUFFAHRTEN ]......'Kreuzungen, Kreisel, Auffahrten (unspezifiziert)' #34170000
+||       |       +----[ ANSCHLUSSSTELLE_AUTOBAHN ]...........'Anschlussstelle (Autobahn)' #34171000
+||       |       +----[ ANSCHLUSSSTELLE_KRAFTFAHRSTRASSE ]...'Anschlussstelle (Kraftfahrstraße)' #34172000
+||       |       +----[ ANSCHLUSSSTELLE_BUNDESSTRASSE ]......'Anschlussstelle (Bundesstraße)' #34173000
+||       |       +----[ ANSCHLUSSSTELLE_SEKUNDAER ]..........'Anschlussstelle (sekundär)' #34174000
+||       |       +----[ ANSCHLUSSSTELLE_TERTIAER ]...........'Anschlussstelle (tertiär)' #34175000
+||       |       +----[ KREISVERKEHR ].......................'Kreisverkehr' #34176000
+||       |           
+||       +---+[ FAHRRAD_FUSS_WEGE_ALL ]..............'Fahrrad- und Fußweg (unspezifiziert)' #34200000
+||       |   +----[ FAHRRAD_FUSS_WEG ]...................'Fahrrad- und Fußweg' #34210000
+||       |   |   
+||       |   +---+[ FAHRRADWEG ].........................'Fahrradweg (unspezifiziert)' #34220000
+||       |   |   +----[ FAHRRADWEG_SEPARAT ].................'Fahrradweg (separat)' #34221000
+||       |   |   +----[ FAHRRADWEG_STREIFEN ]................'Fahrradstreifen' #34222000
+||       |   |       
+||       |   +---+[ FUSSWEG_ALL ]........................'Fußweg (unspezifiziert)' #34230000
+||       |       +----[ FUSSWEG ]............................'Fußweg' #34231000
+||       |       +----[ FUSSGAENGERZONE ]....................'Fußgängerzone' #34232000
+||       |       +----[ TREPPE ].............................'Treppe' #34233000
+||       |       +----[ FUSSGAENGERUEBERWEG ]................'Fußgängerüberweg' #34234000
+||       |       +----[ PFAD_WANDERWEG ].....................'Pfad oder Wanderweg' #34235000
+||       |       +----[ PFAD_WANDERWEG_HISTORISCH ]..........'Pfad oder Wanderweg (historisch)' #34236000
+||       |       +----[ KLETTERSTEIG ].......................'Klettersteig' #34237000
+||       |           
+||       +---+[ WEGE_MORE ]..........................'Weiter Weg (unspezifiziert)' #34300000
+||           +----[ REITWEG ]............................'Reitweg' #34310000
+||           +----[ RENNSTRECKE ]........................'Rennstrecke' #34320000
+||           +----[ BUSSPUR ]............................'Busspur' #34330000
+||               
+[]===+[ WATER ]..............................'Gewässer (unspezifiziert)' #40000000
+||   +---+[ WASSERFLAECHE_STILL ]................'Wasserfläche (still)' #41000000
+||   |   +----[ SEE ]................................'See' #41100000
+||   |   +----[ STAUSEE ]............................'Stausee' #41200000
+||   |   +----[ TEICH ]..............................'Teich' #41300000
+||   |       
+||   +---+[ WASSERFLAECHE_FLIESSEND ]............'Wasserfläche (fließend)' #42000000
+||   |   +---+[ FLUSS ]..............................'Fluss' #42100000
+||   |   |   +----[ STROMSCHNELLE ]......................'Stromschnelle' #42110000
+||   |   |   +----[ WASSERFALL ].........................'Wasserfall' #42120000
+||   |   |       
+||   |   +----[ QUELLE ].............................'Quelle' #42200000
+||   |   +----[ KANAL ]..............................'Kanal' #42300000
+||   |   +----[ ENTWAESSERUNGSGRABEN ]...............'Entwässerungsgraben' #42400000
+||   |   +----[ SENKE ]..............................'Senke' #42500000
+||   |       
+||   +---+[ WASSER_FREIZEIT ]....................'Wasserfreizeit' #43000000
+||       +----[ FISCHFANG ]..........................'Fischfang' #43100000
+||       +----[ TAUCHEN ]............................'Tauchen' #43200000
+||           
+[]===+[ VEGETATION ].........................'Vegetation (unspezifiziert)' #50000000
+||   +---+[ VEGETATION_AREA ]....................'Vegetationsfläche (unspezifiziert)' #51000000
+||   |   +---+[ WALD ]...............................'Wald (unspezifiziert)' #51100000
+||   |   |   +----[ LAUBWALD ]...........................'Laubwald' #51110000
+||   |   |   +----[ NADELWALD ]..........................'Nadelwald' #51120000
+||   |   |   +----[ MISCHWALD ]..........................'Mischwald' #51130000
+||   |   |   +----[ BUSCHWERK ]..........................'Buschwerk' #51140000
+||   |   |       
+||   |   +---+[ AGRICULTURAL ].......................'Landwirtschaftliche Nutzfläche (unspezifiziert)' #51200000
+||   |   |   +----[ ACKERLAND ]..........................'Ackerland (unspezifiziert)' #51210000
+||   |   |   +----[ OBST_ANBAUFLAECHE ]..................'Obstanbau' #51220000
+||   |   |   +----[ WEINBERG ]...........................'Weinberg' #51230000
+||   |   |   +----[ WEIDELAND ]..........................'Weideland' #51240000
+||   |   |   +----[ GEWAECHSHAUS_GARTENBAU ].............'Gewächshausgartenbau' #51250000
+||   |   |   +----[ SALZGEWINNUNG ]......................'Salzgewinnung' #51260000
+||   |   |       
+||   |   +----[ HEIDE ]..............................'Heide' #51300000
+||   |   +----[ MOOR ]...............................'Moor' #51400000
+||   |   |   
+||   |   +---+[ SUMPF ]..............................'Sumpf' #51500000
+||   |   |   +----[ ROEHRICHT ]..........................'Röhricht' #51510000
+||   |   |   +----[ MARSCH ].............................'Marsch' #51520000
+||   |   |   +----[ AUWALD ].............................'Auwald' #51530000
+||   |   |       
+||   |   +----[ FEUCHTWIESE ]........................'Feuchtwiese' #51600000
+||   |   +----[ WATT ]...............................'Watt' #51700000
+||   |   +----[ GRASFLAECHE ]........................'Grasfläche' #51800000
+||   |       
+||   +---+[ VEGETATION_SINGLE_OBJECT ]...........'Vegetationseinzelobjekt (unspezifiziert)' #52000000
+||       +----[ EINZELNER_BAUM ].....................'Einzelner Baum' #52100000
+||       +----[ BAUMREIHE ]..........................'Baumreihe' #52200000
+||       +----[ HECKE ]..............................'Hecke' #52300000
+||           
+[]===+[ GEOLOGY ]............................'Geologische Formation (unspezifiziert)' #60000000
+||   +----[ BERGGIPFEL ].........................'Berg' #61000000
+||   |   
+||   +---+[ VULKAN_STRUKTUR ]....................'Vulkanische Struktur (unspezifiziert)' #62000000
+||   |   +----[ VULKAN_AKTIV ].......................'Aktiver Vulkan' #62100000
+||   |   +----[ VULKAN_INAKTIV ].....................'Inaktiver Vulkan' #62200000
+||   |       
+||   +---+[ WASSER_LAND_FORMATION ]..............'Wasser-Land-Formation (unspezifiziert)' #63000000
+||   |   +----[ INSEL ]..............................'Insel' #63100000
+||   |   +----[ KLIFF ]..............................'Kliff' #63200000
+||   |   +----[ KUESTENLINIE ].......................'Küstenlinie' #63300000
+||   |   +----[ BUCHT ]..............................'Bucht' #63400000
+||   |   +----[ STRAND ].............................'Strand' #63500000
+||   |   +----[ FLUSSUFER ]..........................'Flussufer' #63600000
+||   |   +----[ DEICH ]..............................'Deich' #63700000
+||   |   +----[ BUHNE ]..............................'Buhne' #63800000
+||   |       
+||   +---+[ GESTEINSOBERFLAECHEN ]...............'Gesteinsoberflächen (unspezifiziert)' #64000000
+||   |   +----[ GEROELL ]............................'Geröll' #64100000
+||   |   +----[ FELSEN ].............................'Felsen' #64200000
+||   |   +----[ STEINWUESTE ]........................'Steinwüste' #64300000
+||   |   +----[ SAND ]...............................'Sand' #64400000
+||   |       
+||   +----[ GLETSCHER ]..........................'Gletscher' #65000000
+||   |   
+||   +---+[ FEUCHTE_LANDFLAECHE ]................'Feuchte Landoberflächen (unspezifiziert)' #66000000
+||   |   +----[ SCHLAMM ]............................'Schlamm' #66100000
+||   |       
+||   +---+[ HOEHLENFORMATION ]...................'Höhlenformation (unspezifiziert)' #67000000
+||       +----[ HOEHLE ].............................'Höhle (unspezifiziert)' #67100000
+||       +----[ HOEHLENEINGANG ].....................'Höhleneingang' #67200000
+||           
+[]===+[ OTHER_OBJECTS ]......................'Sonderobjekt (unspezifiziert)' #90000000
+||   +---+[ BUILDINGS_SPECIAL_USAGE ]............'Gebäude anderer Nutzung (unspezifiziert)' #91000000
+||   |   +---+[ MILITARY ]...........................'Militärgebäude (unspezifiziert)' #91100000
+||   |   |   +----[ KASERNE ]............................'Kaserne' #91110000
+||   |   |   +----[ TRUPPENUEBUNGSPLATZ ]................'Truppenübungsplatz' #91120000
+||   |   |   +----[ BUNKER ].............................'Bunker' #91130000
+||   |   |   +----[ FLUGHAFEN_MILITAER ].................'Militär-Flughafen' #91140000
+||   |   |       
+||   |   +---+[ SECURITY ]...........................'Sicherheitsgebäude (unspezifiziert)' #91200000
+||   |       +----[ POLIZEI ]............................'Polizei' #91210000
+||   |       +----[ GEFAENGNIS ].........................'Gefängnis' #91220000
+||   |       +----[ FEUERWEHR ]..........................'Feuerwehr' #91230000
+||   |       +----[ FLOTTENSTUETZPUNKT ].................'Flottenstützpunkt' #91240000
+||   |           
+||   +---+[ AREAS_SPECIAL_USAGE ]................'Flächen anderer Nutzung (unspezifiziert)' #92000000
+||   |   +----[ BAUSTELLE ]..........................'Baustelle (allgemein)' #92100000
+||   |   +----[ MILITAER_SPRERRGEBIET ]..............'Militärisches Sperrgebiet' #92200000
+||   |   |   
+||   |   +---+[ SCHUTZGEBIET ].......................'Schutzgebiet (unspezifiziert)' #92300000
+||   |   |   +----[ NATURSCHUTZGEBIET ]..................'Naturschutzgebiet' #92310000
+||   |   |   +----[ WASSERSCHUTZGEBIET ].................'Wasserschutzgebiet' #92320000
+||   |   |   +----[ NATIONALPARK ].......................'Nationalpark' #92330000
+||   |   |   +----[ LANDSCHAFTSSCHUTZGEBIET ]............'Landschaftsschutzgebiet' #92340000
+||   |   |       
+||   |   +---+[ HISTORIC ]...........................'Historische Anlage (unspezifiziert)' #92400000
+||   |       +--------[ AUSGRABUNGSGEBIET ]..................'Ausgrabungsgebiet' #92401000
+||   |       +--------[ STADTMAUER ].........................'Stadtmauer' #92402000
+||   |       +--------[ STADTTOR ]...........................'Stadttor' #92403000
+||   |       +--------[ HISTORISCHER_TURM ]..................'Historischer Turm' #92404000
+||   |       +--------[ RUINE ]..............................'Ruine' #92405000
+||   |       +--------[ HISTORISCHE_MAUER ]..................'Mauer (historisch)' #92406000
+||   |       +--------[ BURG ]...............................'Burg' #92407000
+||   |       +--------[ SCHLOSS ]............................'Schloss' #92408000
+||   |       +--------[ KLOSTER_HISTORIC ]...................'Kloster (historisch)' #92409000
+||   |       +--------[ KIRCHE_HISTORIC ]....................'Kirche (historisch)' #92410000
+||   |       +--------[ RATHAUS_HISTORIC ]...................'Rathaus (historisch)' #92411000
+||   |       +--------[ BUNKER_HISTORIC ]....................'Bunker (historisch)' #92412000
+||   |       +--------[ WRACK ]..............................'Wrack' #92413000
+||   |       +--------[ HISTORIC_MINE ]......................'Mine (historisch)' #92414000
+||   |               
+||   +---+[ OTHERS_POINT ].......................'Punktartiges Objekt (unspezifiziert)' #93000000
+||   |   +---+[ SIGHT_POINT ]........................'Sehenswertes punktartiges Objekt (unspezifiziert)' #93100000
+||   |   |   +----[ DENKMAL ]............................'Denkmal' #93110000
+||   |   |   +----[ ZIERBRUNNEN ]........................'Zierbrunnen' #93120000
+||   |   |   +----[ KUNSTWERK ]..........................'Kunstwerk' #93130000
+||   |   |   +----[ TOURISTIC_SIGHT ]....................'Touristische Attraktion' #93140000
+||   |   |       
+||   |   +---+[ MARKIERUNGSPUNKT ]...................'Markierungspunkte (unspezifiziert)' #93200000
+||   |   |   +----[ GIPFELKREUZ ]........................'Gipfelkreuz' #93210000
+||   |   |   |   
+||   |   |   +---+[ MEILENSTEIN ]........................'Meilenstein' #93220000
+||   |   |   |   +----[ MEILENSTEIN_RAILWAY ]................'Markierungspunkt (Bahnverkehr)' #93221000
+||   |   |   |   +----[ MEILENSTEIN_SCHIFFFAHRTSVERKEHR ]....'Markierungspunkt (Schifffahrtsverkehr)' #93222000
+||   |   |   |       
+||   |   |   +----[ VERMESSUNGSPUNKT ]...................'Vermessungspunkt' #93230000
+||   |   |   +----[ GRENZSTEIN ].........................'Grenzstein (historisch)' #93240000
+||   |   |       
+||   |   +---+[ OTHERS_POINT_MORE ]..................'Sonstige punktartiges Objekt (unspezifiziert)' #93300000
+||   |   |   +---+[ TURM ]...............................'Turm' #93310000
+||   |   |   |   +----[ BEOBACHTUNGSTURM ]...................'Beobachtungssturm' #93311000
+||   |   |   |       
+||   |   |   +----[ MAST ]...............................'Mast' #93320000
+||   |   |   +----[ SCHORNSTEIN ]........................'Schornstein' #93330000
+||   |   |       
+||   |   +---+[ OTHERS_POINT_PUBLIC ]................'Punktartiges öffentliche Objekt (unspezifiziert)' #93400000
+||   |       +----[ SITZBANK ]...........................'Sitzbank' #93410000
+||   |       +----[ HYDRANT ]............................'Hydrant' #93420000
+||   |       +----[ STREUGUTKONTAINER ]..................'Streugutcontainer' #93430000
+||   |       +----[ MUELLEIMER ].........................'Mülleimer' #93440000
+||   |       +----[ VERKAUFSAUTOMAT ]....................'Verkaufsautomat' #93450000
+||   |       +----[ TRINKWASSERSPENDER ].................'Trinkwasserspender' #93460000
+||   |           
+||   +---+[ BEGRENZUNG ].........................'Begrenzung (unspezifiziert)' #94000000
+||       +----[ ZAUN ]...............................'Zaun' #94100000
+||       +----[ ZAUN_AREA ]..........................'Zaun (Areal)' #94200000
+||       +----[ MAUER ]..............................'Mauer' #94300000
+||       +----[ MAUER_AREA ].........................'Mauer (Areal)' #94400000
+||       +----[ STUETZMAUER ]........................'Stützmauer' #94500000
+||       +----[ SCHLAGBAUM ].........................'Schlagbaum' #94600000
+||       +----[ TOR ]................................'Tor' #94700000
+||       +----[ GRENZUEBERGANG ].....................'Grenzübergang' #94800000
+||       +----[ EINGANG ]............................'Eingang' #94900000
