@@ -6,6 +6,7 @@ import com.vividsolutions.jts.io.WKBReader;
 import fu.geo.Spherical;
 import fu.keys.LSIClassCentreDB;
 import fu.util.DBUtil;
+import mitl.projection.UTMProjection;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 public class Mapout {
 
     private static GeometryFactory geomfact = new GeometryFactory();
+    private static UTMProjection utmProjection = new UTMProjection();
 
     public static void main(String[] args) {
         System.out.println("Mapout class is running");
@@ -36,6 +38,8 @@ public class Mapout {
         int y = Integer.parseInt(args[3]);
         double meter_x = Double.parseDouble(args[4]);
         String filename = args[5];
+
+        utmProjection.project(lat, lon);
 
         get_query_geometry(lat, lon, x, y, meter_x);
 
@@ -111,25 +115,14 @@ public class Mapout {
         System.out.println(halfMeterX + " " + halfMeterY);
 
         double[] cartesian_mid = Spherical.latLongToCartesian(lat, lon);
-        System.out.println("Lat Long: " + lat + " " + lon);
-        System.out.println("Coordinates Mid: " + Arrays.toString(cartesian_mid));
         double[] cartesian_mid_1 = Spherical.latLongToCartesian(lat, lon);
         cartesian_mid_1[0] = cartesian_mid[0] - 512;
-        System.out.println("Coordinates Mid - 512 on x: " + Arrays.toString(cartesian_mid_1));
-        System.out.println("Lat Long after move: " + Arrays.toString(Spherical.cartesianToLatLong(cartesian_mid_1[0], cartesian_mid_1[1], cartesian_mid_1[2])));
-        System.out.println("long moved: " + Spherical.longitudeEastOf(Spherical.latitudeNorthOf(lat, lon, -1024), lon, 0));
-        System.out.println("lat moved: " + Spherical.latitudeNorthOf(lat, lon, -1024));
 
         coords[0] = new Coordinate(Spherical.longitudeEastOf(lat, lon, -halfMeterY), Spherical.latitudeNorthOf(lat, lon, -halfMeterX));
         coords[1] = new Coordinate(Spherical.longitudeEastOf(lat, lon, halfMeterY), Spherical.latitudeNorthOf(lat, lon, -halfMeterX));
         coords[2] = new Coordinate(Spherical.longitudeEastOf(lat, lon, halfMeterY), Spherical.latitudeNorthOf(lat, lon, halfMeterX));
         coords[3] = new Coordinate(Spherical.longitudeEastOf(lat, lon, -halfMeterY), Spherical.latitudeNorthOf(lat, lon, halfMeterX));
         coords[4] = coords[0];
-;
-
-        for (int i = 0; i < coords.length - 1; i++) {
-            System.out.println(coords[i].x + "," + coords[i].y + ",#00FF00,marker,\"Mumbai\"");
-        }
 
         coords[4] = coords[0];
 
