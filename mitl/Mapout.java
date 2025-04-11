@@ -39,7 +39,7 @@ public class Mapout {
         double meter_x = Double.parseDouble(args[4]);
         String filename = args[5];
 
-        utmProjection.project(lat, lon);
+        double[] utmCoords = utmProjection.project(lat, lon);
 
         get_query_geometry(lat, lon, x, y, meter_x);
 
@@ -61,6 +61,9 @@ public class Mapout {
             e.printStackTrace();
             System.exit(1);
         }
+
+
+        utmProjection.inverseProject(utmCoords[0] + 2000, utmCoords[1], utmProjection.getZone(lon), connection);
 
         try {
 
