@@ -3,6 +3,8 @@ package mitl;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKBReader;
+import com.vividsolutions.jts.io.WKBWriter;
+import com.vividsolutions.jts.io.WKTWriter;
 import fu.geo.Spherical;
 import fu.keys.LSIClassCentreDB;
 import fu.util.DBUtil;
@@ -14,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
@@ -22,6 +25,12 @@ public class Mapout {
 
     private static GeometryFactory geomfact = new GeometryFactory();
     private static UTMProjection utmProjection = new UTMProjection();
+
+    private static double meterPerPixel = 0;
+
+    private static double offsetX = 0;
+    private static double offsetY = 0;
+
 
     public static void main(String[] args) {
         System.out.println("Mapout class is running");
@@ -39,15 +48,12 @@ public class Mapout {
         double meter_x = Double.parseDouble(args[4]);
         String filename = args[5];
 
-        double[] utmCoords = utmProjection.project(lat, lon);
+        meterPerPixel = meter_x / x;
 
-        get_query_geometry(lat, lon, x, y, meter_x);
 
-        long time;
         int cnt;
         ResultSet resultSet;
         Statement statement;
-
 
         try {
             /* Zugang zur Datenbank einrichten */
@@ -63,32 +69,46 @@ public class Mapout {
         }
 
 
-        utmProjection.inverseProject(utmCoords[0] + 2000, utmCoords[1], utmProjection.getZone(lon), connection);
-
         try {
+            Geometry queryGeometry = get_query_geometry(lat, lon, x, y, meter_x, connection);
+            System.out.println(new WKTWriter().writeFormatted(queryGeometry));
 
             // Leeres Bild anlegen
-            BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage image = new BufferedImage(x, y, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Antialiasing einschalten
 
+            PreparedStatement preparedStatement = connection.prepareStatement("""
+                    SELECT realname, ST_AsEWKB(geom :: geometry)
+                    FROM domain WHERE (geometry='L' OR geometry='C') AND ((lsiclass1 BETWEEN ? AND ?) OR (lsiclass1 BETWEEN ? AND ?)) AND ST_Intersects(geom :: geometry, ST_GeomFromWKB(?,4326))
+                    ORDER BY ST_Length(geom) DESC
+                    """
+            );
 
-// Eine Objektgeomtrie wird aus der Datenbank geholt und fuer dorenda gemalt
+            int[] lcStrassen=LSIClassCentreDB.lsiClassRange("STRASSEN_WEGE");
+            int[] lcRail=LSIClassCentreDB.lsiClassRange("BAHNVERKEHR");
 
-            statement=connection.createStatement();
-            statement.setFetchSize(1000);
-            resultSet = statement.executeQuery("select realname,ST_AsEWKB(geom :: geometry) from domain where realname ='Lorenzer Platz' AND geometry='A'");
+            int col=1;
+            preparedStatement.setInt(col++,lcStrassen[0]);
+            preparedStatement.setInt(col++,lcStrassen[1]);
+            preparedStatement.setInt(col++,lcRail[0]);
+            preparedStatement.setInt(col++,lcRail[1]);
+            preparedStatement.setBytes(col++,new WKBWriter().write(queryGeometry));
 
-            cnt=0;
+            preparedStatement.setFetchSize(1000);
+
+            resultSet = preparedStatement.executeQuery();
+
+            cnt = 0;
 
             while (resultSet.next()) {
-                int col=1;
-                String realname=resultSet.getString(col++);
-                byte[] geomdata=resultSet.getBytes(col++);
-                Geometry geom=new WKBReader().read(geomdata);
+                col = 1;
+                String realname = resultSet.getString(col++);
+                byte[] geomdata = resultSet.getBytes(col++);
+                Geometry geom = new WKBReader().read(geomdata);
                 System.out.println(realname);
 
-                paintGeometry(g,geom,realname,"fontain");
+                paintGeometry(g, geom, realname, "fontain");
 
                 cnt++;
             }
@@ -107,26 +127,29 @@ public class Mapout {
         }
     }
 
-    public static Geometry get_query_geometry(double lat, double lon, int x, int y, double meter_x) {
+    public static Geometry get_query_geometry(double lat, double lon, int mapX, int mapY, double meterX, Connection connection) {
         Coordinate[] coords = new Coordinate[5];
 
-        double halfMeterX = meter_x / 2;
-        double meterPerPixel = meter_x / x;
-        double meterY = meterPerPixel * y;
+        double halfMeterX = meterX / 2;
+        double meterY = meterPerPixel * mapY;
         double halfMeterY = meterY / 2;
 
         System.out.println(halfMeterX + " " + halfMeterY);
 
-        double[] cartesian_mid = Spherical.latLongToCartesian(lat, lon);
-        double[] cartesian_mid_1 = Spherical.latLongToCartesian(lat, lon);
-        cartesian_mid_1[0] = cartesian_mid[0] - 512;
+        double[] utmCenter = utmProjection.project(lat, lon);
+        int zone = utmProjection.getZone(lon);
+        double[] invLeftTop = utmProjection.inverseProject(utmCenter[0] - halfMeterX, utmCenter[1] - halfMeterY, zone, connection);
+        double[] invRightTop = utmProjection.inverseProject(utmCenter[0] + halfMeterX, utmCenter[1] - halfMeterY, zone, connection);
+        double[] invRightBottom = utmProjection.inverseProject(utmCenter[0] + halfMeterX, utmCenter[1] + halfMeterY, zone, connection);
+        double[] invLeftBottom = utmProjection.inverseProject(utmCenter[0] - halfMeterX, utmCenter[1] + halfMeterY, zone, connection);
 
-        coords[0] = new Coordinate(Spherical.longitudeEastOf(lat, lon, -halfMeterY), Spherical.latitudeNorthOf(lat, lon, -halfMeterX));
-        coords[1] = new Coordinate(Spherical.longitudeEastOf(lat, lon, halfMeterY), Spherical.latitudeNorthOf(lat, lon, -halfMeterX));
-        coords[2] = new Coordinate(Spherical.longitudeEastOf(lat, lon, halfMeterY), Spherical.latitudeNorthOf(lat, lon, halfMeterX));
-        coords[3] = new Coordinate(Spherical.longitudeEastOf(lat, lon, -halfMeterY), Spherical.latitudeNorthOf(lat, lon, halfMeterX));
-        coords[4] = coords[0];
+        offsetX = utmCenter[0] - halfMeterX;
+        offsetY = utmCenter[1] - halfMeterY;
 
+        coords[0] = new Coordinate(invLeftTop[1], invLeftTop[0]);
+        coords[1] = new Coordinate(invRightTop[1], invRightTop[0]);
+        coords[2] = new Coordinate(invRightBottom[1], invRightBottom[0]);
+        coords[3] = new Coordinate(invLeftBottom[1], invLeftBottom[0]);
         coords[4] = coords[0];
 
         return geomfact.createPolygon(geomfact.createLinearRing(coords), new LinearRing[0]);
@@ -134,7 +157,7 @@ public class Mapout {
     public static void paintGeometry(Graphics2D g,Geometry geom,String name,String icon) throws IOException {
         if (geom instanceof com.vividsolutions.jts.geom.Polygon) {
 
-            LineString extring=((Polygon)geom).getExteriorRing();
+            /*LineString extring=((Polygon)geom).getExteriorRing();
             int n=extring.getNumPoints();
 
             double minX= 1e10;
@@ -166,10 +189,27 @@ public class Mapout {
             BufferedImage iconImage=ImageIO.read(new File("icons"+File.separator+icon+".png"));
             g.drawImage(iconImage,200,220,null);
 
-            g.drawString(name,200,200);
+            g.drawString(name,200,200);*/
+            System.out.println("Drawing Poly");
 
         }
+        else if (geom instanceof com.vividsolutions.jts.geom.LineString) {
+            LineString ls = (LineString) geom;
+            Coordinate[] coordinates = ls.getCoordinates();
+
+            for (int i = 0; i < ls.getNumPoints() - 1; ++i) {
+                double[] point1 = utmProjection.project(coordinates[i].y, coordinates[i].x);
+                double[] point2 = utmProjection.project(coordinates[i + 1].y, coordinates[i + 1].x);
+                point1[0] -= offsetX;
+                point1[1] -= offsetY;
+                point2[0] -= offsetX;
+                point2[1] -= offsetY;
+
+                g.setColor(Color.RED);
+                g.drawLine((int) (point1[0] / meterPerPixel),2048 - (int) (point1[1] / meterPerPixel), (int) (point2[0] / meterPerPixel),2048 - (int) (point2[1] / meterPerPixel));
+            }
+        }
         else
-            throw new IllegalArgumentException("Don't know how to paint "+geom.getClass());
+            System.out.println("Don't know how to paint " + geom.getClass());
     }
 }

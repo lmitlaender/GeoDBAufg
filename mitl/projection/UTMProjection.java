@@ -58,9 +58,7 @@ public class UTMProjection {
         double lon = lon_deg * Math.PI / 180;
 
         int zone = getZone(lon_deg);
-        System.out.println("Zone: " + zone);
         double centralMeridian = getCentralMeridianRad(zone);
-        System.out.println("centralMeridian: " + centralMeridian);
 
         // No atanh in Math sadly - replace with 0.5ln((1 + x) / (1 - x))
         double t = Math.sinh(
@@ -81,9 +79,6 @@ public class UTMProjection {
         // km to m
         utmCoordinates[0] *= 1000;
         utmCoordinates[1] *= 1000;
-
-        System.out.println("UTM Coord: " + utmCoordinates[0]);
-        System.out.println("UTM Coord: " + utmCoordinates[1]);
 
         return utmCoordinates;
     }
@@ -133,23 +128,17 @@ public class UTMProjection {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String geom_wkt = resultSet.getString("geom_wkt");
-                    System.out.println(geom_wkt);
                     latLongPoint = (Point) new WKTReader().read(geom_wkt);
                 }
             } catch (ParseException e) {
                 e.printStackTrace();
-                System.out.println("failpoint 1");
                 return new double[]{0.0, 0.0};
             }
 
         } catch (SQLException e) {
-            System.out.println("failpoint 2");
             e.printStackTrace();
             return new double[]{0.0, 0.0};
         }
-
-        System.out.println("Lat Coord: " + latLongPoint.getY());
-        System.out.println("Long Coord: " + latLongPoint.getX());
 
         return new double[]{latLongPoint.getY(), latLongPoint.getX()};
 
