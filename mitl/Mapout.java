@@ -116,7 +116,7 @@ public class Mapout {
             resultSet.close();
 
             System.out.println("Schreibe Bild ...");
-            mapPainter.saveImage(filename + ".png");
+            mapPainter.saveImage(filename);
             System.out.println("Bild geschrieben");
 
         }

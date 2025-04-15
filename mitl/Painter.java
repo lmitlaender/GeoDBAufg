@@ -104,6 +104,18 @@ public class Painter {
             System.out.println("Don't know how to paint " + geom.getClass());
     }
 
+    private void drawText(Graphics2D g, String text, double x, double y, Color color, int fontSize, double angle) {
+        g.setColor(color);
+        g.setFont(new Font("Arial", Font.PLAIN, fontSize));
+        int[] renderPoint = {
+                (int) ((x - offsetX) / meterPerPixel),
+                height - (int) ((y - offsetY) / meterPerPixel)
+        };
+        g.rotate(Math.toRadians(angle), renderPoint[0], renderPoint[1]);
+        g.drawString(text, renderPoint[0], renderPoint[1]);
+        g.rotate(-Math.toRadians(angle), renderPoint[0], renderPoint[1]);
+    }
+
     private void drawPolygon(Graphics2D g, Polygon polygon, Color color) {
         g.setColor(color);
         g.setStroke(new BasicStroke(1));
