@@ -1,9 +1,6 @@
 package mitl.projection;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKTReader;
@@ -164,5 +161,45 @@ public class UTMProjection {
         latLongCoords[1] = centralMeridian + Math.atan2(Math.sinh(xiPrime), Math.cos(etaPrime));
 
         return latLongCoords; */
+    }
+
+    public Geometry projectGeometry(Geometry geom) {
+        // Project a geometry to UTM coordinates
+        GeometryFactory factory = new GeometryFactory();
+
+        if (geom instanceof Point) {
+            double[] utmCoordinates = project(geom.getCoordinate().y, geom.getCoordinate().x);
+            return new GeometryFactory().createPoint(new Coordinate(utmCoordinates[0], utmCoordinates[1]));
+        } else if (geom instanceof LineString lineString) {
+            Coordinate[] coordinates = new Coordinate[lineString.getNumPoints()];
+            for (int i = 0; i < lineString.getNumPoints(); i++) {
+                double[] utmCoordinates = project(lineString.getCoordinateN(i).y, lineString.getCoordinateN(i).x);
+                coordinates[i] = new Coordinate(utmCoordinates[0], utmCoordinates[1]);
+            }
+            return factory.createLineString(coordinates);
+        } else if (geom instanceof Polygon polygon) {
+            LinearRing shell = factory.createLinearRing(projectGeometry(polygon.getExteriorRing()).getCoordinates());
+            LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
+            for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+                holes[i] = factory.createLinearRing(projectGeometry(polygon.getInteriorRingN(i)).getCoordinates());
+            }
+            return factory.createPolygon(shell, holes);
+        } else if (geom instanceof MultiLineString multiLineString) {
+            LineString[] lineStrings = new LineString[multiLineString.getNumGeometries()];
+            for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
+                lineStrings[i] = (LineString) projectGeometry(multiLineString.getGeometryN(i));
+            }
+
+            return factory.createMultiLineString(lineStrings);
+        } else if (geom instanceof MultiPolygon multiPolygon) {
+            Polygon[] polygons = new Polygon[multiPolygon.getNumGeometries()];
+            for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+                polygons[i] = (Polygon) projectGeometry(multiPolygon.getGeometryN(i));
+            }
+
+            return factory.createMultiPolygon(polygons);
+        } else {
+            throw new UnsupportedOperationException("Unsupported geometry type: " + geom.getClass());
+        }
     }
 }

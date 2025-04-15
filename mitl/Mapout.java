@@ -25,6 +25,7 @@ public class Mapout {
 
     private static GeometryFactory geomfact = new GeometryFactory();
     private static UTMProjection utmProjection = new UTMProjection();
+    private static Painter mapPainter;
 
     private static double meterPerPixel = 0;
 
@@ -47,9 +48,7 @@ public class Mapout {
         int y = Integer.parseInt(args[3]);
         double meter_x = Double.parseDouble(args[4]);
         String filename = args[5];
-
         meterPerPixel = meter_x / x;
-
 
         int cnt;
         ResultSet resultSet;
@@ -69,31 +68,30 @@ public class Mapout {
         }
 
 
+        Geometry queryGeometry = get_query_geometry(lat, lon, x, y, meter_x, connection);
+        System.out.println(new WKTWriter().writeFormatted(queryGeometry));
+
+        mapPainter = new Painter(x, y, meterPerPixel, offsetX, offsetY);
+
         try {
-            Geometry queryGeometry = get_query_geometry(lat, lon, x, y, meter_x, connection);
-            System.out.println(new WKTWriter().writeFormatted(queryGeometry));
-
-            // Leeres Bild anlegen
-            BufferedImage image = new BufferedImage(x, y, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = (Graphics2D) image.getGraphics();
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Antialiasing einschalten
-
             PreparedStatement preparedStatement = connection.prepareStatement("""
-                    SELECT realname, ST_AsEWKB(geom :: geometry)
-                    FROM domain WHERE (geometry='L' OR geometry='C') AND ((lsiclass1 BETWEEN ? AND ?) OR (lsiclass1 BETWEEN ? AND ?)) AND ST_Intersects(geom :: geometry, ST_GeomFromWKB(?,4326))
+                    SELECT realname, lsiclass1, ST_AsEWKB(geom :: geometry)
+                    FROM domain WHERE ((lsiclass1 BETWEEN ? AND ?) OR (lsiclass1 BETWEEN ? AND ?)) AND ST_Intersects(geom :: geometry, ST_GeomFromWKB(?,4326))
                     ORDER BY ST_Length(geom) DESC
                     """
             );
 
-            int[] lcStrassen=LSIClassCentreDB.lsiClassRange("STRASSEN_WEGE");
-            int[] lcRail=LSIClassCentreDB.lsiClassRange("BAHNVERKEHR");
+            int[] lc1=LSIClassCentreDB.lsiClassRange("BUILDING");
+            int[] lcRail=LSIClassCentreDB.lsiClassRange("GLEISKOERPER");
 
             int col=1;
-            preparedStatement.setInt(col++,lcStrassen[0]);
-            preparedStatement.setInt(col++,lcStrassen[1]);
-            preparedStatement.setInt(col++,lcRail[0]);
-            preparedStatement.setInt(col++,lcRail[1]);
-            preparedStatement.setBytes(col++,new WKBWriter().write(queryGeometry));
+            preparedStatement.setInt(col++, lc1[0]);
+            preparedStatement.setInt(col++, lc1[1]);
+            preparedStatement.setInt(col++, lcRail[0]);
+            preparedStatement.setInt(col++, lcRail[1]);
+            preparedStatement.setBytes(col++, new WKBWriter().write(queryGeometry));
+
+            System.out.println("Querying with "+preparedStatement.toString());
 
             preparedStatement.setFetchSize(1000);
 
@@ -104,19 +102,21 @@ public class Mapout {
             while (resultSet.next()) {
                 col = 1;
                 String realname = resultSet.getString(col++);
+                int lsiClass = resultSet.getInt(col++);
                 byte[] geomdata = resultSet.getBytes(col++);
                 Geometry geom = new WKBReader().read(geomdata);
-                System.out.println(realname);
 
-                paintGeometry(g, geom, realname, "fontain");
+                Geometry projectedGeometry = utmProjection.projectGeometry(geom);
+
+                mapPainter.paintLSIClass(lsiClass, projectedGeometry);
+
 
                 cnt++;
             }
             resultSet.close();
 
             System.out.println("Schreibe Bild ...");
-            g.dispose();
-            ImageIO.write(image, "PNG", new File("demoimage_mitl.png"));  // Als die Karte als PNG speichern
+            mapPainter.saveImage(filename + ".png");
             System.out.println("Bild geschrieben");
 
         }
@@ -155,61 +155,6 @@ public class Mapout {
         return geomfact.createPolygon(geomfact.createLinearRing(coords), new LinearRing[0]);
     }
     public static void paintGeometry(Graphics2D g,Geometry geom,String name,String icon) throws IOException {
-        if (geom instanceof com.vividsolutions.jts.geom.Polygon) {
 
-            /*LineString extring=((Polygon)geom).getExteriorRing();
-            int n=extring.getNumPoints();
-
-            double minX= 1e10;
-            double minY= 1e10;
-            double maxX=-1e10;
-            double maxY=-1e10;
-
-            for (int i=0;i<n;i++) {
-                Coordinate coord=extring.getCoordinateN(i);
-                minX=Math.min(minX,coord.x);
-                minY=Math.min(minY,coord.y);
-                maxX=Math.max(maxX,coord.x);
-                maxY=Math.max(maxY,coord.y);
-            }
-
-
-            int[] x=new int[n];
-            int[] y=new int[n];
-
-            for (int i=0;i<n;i++) {
-                Coordinate coord=extring.getCoordinateN(i);
-                x[i]=(int)Math.round((coord.x-minX)*512/(maxX-minX));
-                y[i]=511-(int)Math.round((coord.y-minY)*512/(maxY-minY));
-            }
-
-            g.setColor(Color.RED);
-            g.drawPolygon(x,y,x.length);
-
-            BufferedImage iconImage=ImageIO.read(new File("icons"+File.separator+icon+".png"));
-            g.drawImage(iconImage,200,220,null);
-
-            g.drawString(name,200,200);*/
-            System.out.println("Drawing Poly");
-
-        }
-        else if (geom instanceof com.vividsolutions.jts.geom.LineString) {
-            LineString ls = (LineString) geom;
-            Coordinate[] coordinates = ls.getCoordinates();
-
-            for (int i = 0; i < ls.getNumPoints() - 1; ++i) {
-                double[] point1 = utmProjection.project(coordinates[i].y, coordinates[i].x);
-                double[] point2 = utmProjection.project(coordinates[i + 1].y, coordinates[i + 1].x);
-                point1[0] -= offsetX;
-                point1[1] -= offsetY;
-                point2[0] -= offsetX;
-                point2[1] -= offsetY;
-
-                g.setColor(Color.RED);
-                g.drawLine((int) (point1[0] / meterPerPixel),2048 - (int) (point1[1] / meterPerPixel), (int) (point2[0] / meterPerPixel),2048 - (int) (point2[1] / meterPerPixel));
-            }
-        }
-        else
-            System.out.println("Don't know how to paint " + geom.getClass());
     }
 }
