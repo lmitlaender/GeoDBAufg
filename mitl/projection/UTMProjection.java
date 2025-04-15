@@ -198,6 +198,19 @@ public class UTMProjection {
             }
 
             return factory.createMultiPolygon(polygons);
+        } else if (geom instanceof MultiPoint multiPoint) {
+            Point[] points = new Point[multiPoint.getNumGeometries()];
+            for (int i = 0; i < multiPoint.getNumGeometries(); i++) {
+                points[i] = (Point) projectGeometry(multiPoint.getGeometryN(i));
+            }
+
+            return factory.createMultiPoint(points);
+        } else if (geom instanceof GeometryCollection geometryCollection) {
+            Geometry[] geometries = new Geometry[geometryCollection.getNumGeometries()];
+            for (int i = 0; i < geometryCollection.getNumGeometries(); i++) {
+                geometries[i] = projectGeometry(geometryCollection.getGeometryN(i));
+            }
+            return factory.createGeometryCollection(geometries);
         } else {
             throw new UnsupportedOperationException("Unsupported geometry type: " + geom.getClass());
         }

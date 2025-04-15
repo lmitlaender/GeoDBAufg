@@ -1,1 +1,1 @@
-java -cp geo.jar;mitl.jar mitl.Mapout 49.445555 11.082587 4096 2048 2000.0 mapout.png
+java -cp geo.jar;mitl.jar mitl.Mapout 49.480020 10.988567 4096 2048 2000.0 mapout.png

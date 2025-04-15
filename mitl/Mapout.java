@@ -76,20 +76,13 @@ public class Mapout {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("""
                     SELECT realname, lsiclass1, ST_AsEWKB(geom :: geometry)
-                    FROM domain WHERE ((lsiclass1 BETWEEN ? AND ?) OR (lsiclass1 BETWEEN ? AND ?)) AND ST_Intersects(geom :: geometry, ST_GeomFromWKB(?,4326))
+                    FROM domain WHERE ST_Intersects(geom :: geometry, ST_GeomFromText(?,4326))
                     ORDER BY ST_Length(geom) DESC
                     """
             );
 
-            int[] lc1=LSIClassCentreDB.lsiClassRange("BUILDING");
-            int[] lcRail=LSIClassCentreDB.lsiClassRange("GLEISKOERPER");
-
             int col=1;
-            preparedStatement.setInt(col++, lc1[0]);
-            preparedStatement.setInt(col++, lc1[1]);
-            preparedStatement.setInt(col++, lcRail[0]);
-            preparedStatement.setInt(col++, lcRail[1]);
-            preparedStatement.setBytes(col++, new WKBWriter().write(queryGeometry));
+            preparedStatement.setString(col++, new WKTWriter().write(queryGeometry));
 
             System.out.println("Querying with "+preparedStatement.toString());
 
