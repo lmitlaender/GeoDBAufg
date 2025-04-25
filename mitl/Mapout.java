@@ -101,7 +101,7 @@ public class Mapout {
 
                 Geometry projectedGeometry = utmProjection.projectGeometry(geom);
 
-                mapPainter.paintLSIClass(lsiClass, projectedGeometry);
+                mapPainter.paintLSIClass(lsiClass, projectedGeometry, realname);
 
 
                 cnt++;

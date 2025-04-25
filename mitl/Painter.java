@@ -1,15 +1,17 @@
 package mitl;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.awt.PointShapeFactory;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKTWriter;
 import fu.keys.LSIClass;
 import fu.keys.LSIClassCentreDB;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +29,29 @@ public class Painter {
     private final double meterPerPixel;
     private final double offsetX;
     private final double offsetY;
+
+    public static enum StreetCategory {
+        AUTOBAHN(Color.DARK_GRAY, 12),
+        KRAFTFAHRSTRASSE(Color.MAGENTA, 8),
+        STANDARD_STRASSE(Color.GRAY, 3),
+        FELD_WALD_WEG(Color.GRAY, 3),
+        AUFFAHRT(Color.GRAY, 3);
+
+        private final Color color;
+        private final int width;
+
+        // Constructor that takes a Color and width (in arbitrary units like pixels)
+        StreetCategory(Color color, int width) {
+            this.color = color;
+            this.width = width;
+        }
+        public Color getColor() {
+            return color;
+        }
+        public int getWidth() {
+            return width;
+        }
+    }
 
     public Painter(int width, int height, double meterPerPixel, double offsetX, double offsetY) {
         this.width = width;
@@ -60,160 +85,67 @@ public class Painter {
         }
     }
 
-    public void paintLSIClass(int lsiClass, Geometry geom) {
-        List<Integer> railList = new ArrayList<>();
-        railList.add(LSIClassCentreDB.lsiClass("MONORAIL"));
-        railList.add(LSIClassCentreDB.lsiClass("TRAM_GLEISE"));
-        railList.add(LSIClassCentreDB.lsiClass("GLEISKOERPER"));
+    public void paintLSIClass(int lsiClass, Geometry geom, String name) {
+        LSIMapper.PaintType paintType = LSIMapper.lsiCodeToPaintType(lsiClass);
 
-        List<Integer> standardRoadList = new ArrayList<>();
-        standardRoadList.add(LSIClassCentreDB.lsiClass("LANDSTRASSE"));
-        standardRoadList.add(LSIClassCentreDB.lsiClass("INNERORTSTRASSE"));
-        standardRoadList.add(LSIClassCentreDB.lsiClass("ERSCHLIESSUNGSWEG"));
-        // add with lambda
-        IntStream.of(LSIClassCentreDB.subClasses(standardRoadList.get(0)))
-                .forEach(standardRoadList::add);
-
-        List<Integer> streetJunctionList = new ArrayList<>();
-        streetJunctionList.add(LSIClassCentreDB.lsiClass("KREUZUNGEN_KREISEL_AUFFAHRTEN"));
-        IntStream.of(LSIClassCentreDB.subClasses(streetJunctionList.get(0)))
-                .forEach(streetJunctionList::add);
-
-        List<Integer> vegetationList = new ArrayList<>();
-        vegetationList.add(LSIClassCentreDB.lsiClass("VEGETATION"));
-        IntStream.of(LSIClassCentreDB.subClasses(vegetationList.get(0)))
-                .forEach(x -> {
-                    vegetationList.add(x);
-                    IntStream.of(LSIClassCentreDB.subClasses(x))
-                            .forEach(y -> {
-                                vegetationList.add(y);
-                                IntStream.of(LSIClassCentreDB.subClasses(y))
-                                        .forEach(z -> vegetationList.add(z));
-                            });
-                });
-
-        List<Integer> footCyclePathList = new ArrayList<>();
-        footCyclePathList.add(LSIClassCentreDB.lsiClass("FAHRRAD_FUSS_WEGE_ALL"));
-        IntStream.of(LSIClassCentreDB.subClasses(footCyclePathList.get(0)))
-                .forEach(x -> {
-                    footCyclePathList.add(x);
-                    IntStream.of(LSIClassCentreDB.subClasses(x))
-                            .forEach(y -> {
-                                footCyclePathList.add(y);
-                                IntStream.of(LSIClassCentreDB.subClasses(y))
-                                        .forEach(z -> footCyclePathList.add(z));
-                            });
-                });
-
-
-        List<Integer> uebernachtungenList = new ArrayList<>();
-        uebernachtungenList.add(LSIClassCentreDB.lsiClass("UEBERNACHTUNGEN"));
-        IntStream.of(LSIClassCentreDB.subClasses(uebernachtungenList.get(0)))
-                .forEach(uebernachtungenList::add);
-
-        List<Integer> buildingList = new ArrayList<>();
-        buildingList.add(LSIClassCentreDB.lsiClass("BUILDING"));
-        IntStream.of(LSIClassCentreDB.subClasses(buildingList.get(0)))
-                .forEach(x -> {
-                    buildingList.add(x);
-                    IntStream.of(LSIClassCentreDB.subClasses(x))
-                            .forEach(y -> {
-                                buildingList.add(y);
-                                IntStream.of(LSIClassCentreDB.subClasses(y))
-                                        .forEach(z -> buildingList.add(z));
-                            });
-                });
-
-        List<Integer> waterList = new ArrayList<>();
-        waterList.add(LSIClassCentreDB.lsiClass("WATER"));
-        IntStream.of(LSIClassCentreDB.subClasses(waterList.get(0)))
-                .forEach(x -> {
-                    waterList.add(x);
-                    IntStream.of(LSIClassCentreDB.subClasses(x))
-                            .forEach(y -> {
-                                waterList.add(y);
-                                IntStream.of(LSIClassCentreDB.subClasses(y))
-                                        .forEach(z -> waterList.add(z));
-                            });
-                });
-
-
-        // TODO: Map width to average width for type
-        if (railList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[3], geom, Color.lightGray, 1);
-        } else if (lsiClass == LSIClassCentreDB.lsiClass("AUTOBAHN")) {
-            drawGeometryBasedOnType(gLayers[3], geom, Color.GREEN, 5);
-        } else if (lsiClass == LSIClassCentreDB.lsiClass("KRAFTFAHRSTRASSE")) {
-            drawGeometryBasedOnType(gLayers[3], geom, Color.MAGENTA, 3);
-        } else if (standardRoadList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[3], geom, Color.DARK_GRAY, 3);
-        } else if (lsiClass == LSIClassCentreDB.lsiClass("FELD_WALD_WEG")) {
-            drawGeometryBasedOnType(gLayers[3], geom, Color.RED, 3);
-        } else if (streetJunctionList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[3], geom, Color.MAGENTA, 3);
-        } else if (vegetationList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[1], geom, new Color(234, 255, 225), 5);
-        } else if (uebernachtungenList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[4], geom, Color.CYAN, 3);
-        } else if (buildingList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[4], geom, Color.MAGENTA, 3);
-        } else if (waterList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[1], geom, Color.BLUE, 3);
-        // TODO: footCyclePathList hat gerade auch z.B. "Plätze" drin wie den Grünen Markt
-        } else if (footCyclePathList.contains(lsiClass)) {
-            drawGeometryBasedOnType(gLayers[3], geom, Color.gray, 1);
-        } else if (lsiClass == LSIClassCentreDB.lsiClass("BRIDGE")) {
-            drawGeometryBasedOnType(gLayers[2], geom, Color.darkGray, 3);
+        if (paintType == null) {
+            //System.out.println("Unknown LSI code: " + lsiClass);
+            return;
         }
 
-        /*if (geom instanceof com.vividsolutions.jts.geom.Polygon) {
-            if (lsiClass == 20120000) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.GREEN);
-            } else if (lsiClass == 20120100) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.YELLOW);
-            } else if (lsiClass == 20120200) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.ORANGE);
-            } else if (lsiClass == 20120300) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.RED);
-            } else if (lsiClass == 20120400) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.MAGENTA);
-            } else if (lsiClass == 20120500) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.CYAN);
-            } else if (lsiClass == 20120600) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.BLUE);
-            } else if (lsiClass == 20120700) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.PINK);
-            } else if (lsiClass == 20120800) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.LIGHT_GRAY);
-            } else if (lsiClass == 20120900) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.DARK_GRAY);
-            } else if (lsiClass == 20121000) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.GRAY);
-            } else if (lsiClass == 20121100) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.WHITE);
-            } else if (lsiClass == 20121200) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.BLACK);
-            } else if (lsiClass == 20121300) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.DARK_GRAY);
-            } else if (lsiClass == 20121400) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.LIGHT_GRAY);
-            } else if (lsiClass == 20121500) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.YELLOW);
-            } else if (lsiClass == 20121600) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.ORANGE);
-            } else if (lsiClass == 20121700) {
-                drawPolygon(gLayers[5], (Polygon) geom, Color.RED);
-            } else { // Default color for unknown classes
-                System.out.println("Unknown LSI class: " + lsiClass);
-                drawPolygon(gLayers[5], (Polygon) geom, Color.GRAY);
+        if (lsiClass == LSIClassCentreDB.lsiClass("FUSSGAENGERZONE") && geom instanceof Polygon) {
+            // Don't print Fussgaengerzone polygons - we only want internal walking paths
+            return;
+        }
+
+
+        switch (paintType) {
+            case Autobahn -> drawStreet(geom, StreetCategory.AUTOBAHN, name);
+            case Kraftfahrstrasse -> drawStreet(geom, StreetCategory.KRAFTFAHRSTRASSE, name);
+            case StandardStrasse -> drawStreet(geom, StreetCategory.STANDARD_STRASSE, name);
+            case FeldWaldWeg -> drawStreet(geom, StreetCategory.FELD_WALD_WEG, name);
+            case Auffahrt -> drawStreet(geom, StreetCategory.AUFFAHRT, name);
+            case Rail -> drawGeometryBasedOnType(gLayers[3], geom, Color.lightGray, 1);
+            case Vegetation -> drawGeometryBasedOnType(gLayers[1], geom, new Color(234, 255, 225), 5);
+            case FootCyclePath -> drawGeometryBasedOnType(gLayers[3], geom, Color.gray, 1);
+            case Overnight -> drawGeometryBasedOnType(gLayers[4], geom, Color.CYAN, 3);
+            case Building -> drawGeometryBasedOnType(gLayers[4], geom, Color.MAGENTA, 3);
+            case Water -> drawGeometryBasedOnType(gLayers[1], geom, Color.BLUE, 3);
+            case Bridge -> drawGeometryBasedOnType(gLayers[2], geom, Color.darkGray, 3);
+            //default -> System.out.println("Unhandled LSI code: " + lsiClass);
+        }
+    }
+
+    private void drawStreet(Geometry geom, StreetCategory streetCategory, String name) {
+        int width = (int) Math.floor((streetCategory.getWidth() / meterPerPixel) + 1);
+        Color color = streetCategory.getColor();
+
+        drawGeometryBasedOnType(gLayers[3], geom, color, width);
+
+        // Draw text segments if the width is greater than 12
+        if (width > 12 && geom instanceof LineString lineString) {
+            for (int i = 0; i < lineString.getNumPoints() - 1; i++) {
+                Coordinate start = lineString.getCoordinateN(i);
+                Coordinate end = lineString.getCoordinateN(i + 1);
+
+                double StartX = start.x;
+                double StartY = start.y;
+                double EndX = end.x;
+                double EndY = end.y;
+
+                double length = Math.sqrt(Math.pow(EndX - StartX, 2) + Math.pow(EndY - StartY, 2)) / meterPerPixel;
+                if (length < name.length() * 8) {
+                    continue; // Skip if the length is too short
+                }
+
+                double angle = -Math.toDegrees(Math.atan2(EndY - StartY, EndX - StartX));
+
+                double midX = (StartX + EndX) / 2;
+                double midY = (StartY + EndY) / 2;
+
+                drawText(gLayers[8], name, midX, midY, Color.WHITE, 12, angle);
             }
-
         }
-        else if (geom instanceof LineString ls) {
-            drawLineString(gLayers[8], ls, Color.RED, 3);
-        }
-        else
-            System.out.println("Don't know how to paint " + geom.getClass());*/
     }
 
     private void drawGeometryBasedOnType(Graphics2D g, Geometry geom, Color color, int strokeWidth) {
@@ -221,9 +153,9 @@ public class Painter {
     }
 
     private void drawGeometryBasedOnType(Graphics2D g, Geometry geom, Color color, BasicStroke stroke) {
-        if (geom instanceof Polygon polygon) {
+        if (geom instanceof com.vividsolutions.jts.geom.Polygon polygon) {
             drawPolygon(g, polygon, color, stroke);
-        } else if (geom instanceof LineString lineString) {
+        } else if (geom instanceof com.vividsolutions.jts.geom.LineString lineString) {
             drawLineString(g, lineString, color, stroke);
         } else if (geom instanceof com.vividsolutions.jts.geom.Point point){
             drawPoint(g, point.getX(), point.getY(), color, (int) stroke.getLineWidth());
@@ -233,11 +165,11 @@ public class Painter {
             }
         } else if (geom instanceof com.vividsolutions.jts.geom.MultiLineString multiLineString) {
             for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-                drawLineString(g, (LineString) multiLineString.getGeometryN(i), color, stroke);
+                drawLineString(g, (com.vividsolutions.jts.geom.LineString) multiLineString.getGeometryN(i), color, stroke);
             }
         } else if (geom instanceof com.vividsolutions.jts.geom.MultiPolygon multiPolygon) {
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-                drawPolygon(g, (Polygon) multiPolygon.getGeometryN(i), color, stroke);
+                drawGeometryBasedOnType(g, multiPolygon.getGeometryN(i), color, stroke);
             }
         } else {
             System.out.println("Unknown geometry type: " + geom.getClass());
@@ -251,16 +183,26 @@ public class Painter {
                 (int) ((x - offsetX) / meterPerPixel),
                 height - (int) ((y - offsetY) / meterPerPixel)
         };
+        if (angle < 0) {
+            angle += 180;
+        }
+        if (angle > 90) {
+            angle -= 180;
+        }
+        renderPoint[1] += fontSize / 2;
+
+        System.out.println("Drawing text: " + text + " with angle: " + angle);
+
         g.rotate(Math.toRadians(angle), renderPoint[0], renderPoint[1]);
         g.drawString(text, renderPoint[0], renderPoint[1]);
         g.rotate(-Math.toRadians(angle), renderPoint[0], renderPoint[1]);
     }
 
-    private void drawPolygon(Graphics2D g, Polygon polygon, Color color) {
+    private void drawPolygon(Graphics2D g, com.vividsolutions.jts.geom.Polygon polygon, Color color) {
         drawPolygon(g, polygon, color, new BasicStroke(1));
     }
 
-    private void drawPolygon(Graphics2D g, Polygon polygon, Color color, Stroke stroke) {
+    private void drawPolygon(Graphics2D g, com.vividsolutions.jts.geom.Polygon polygon, Color color, Stroke stroke) {
         g.setColor(color);
         g.setStroke(stroke);
 
@@ -294,15 +236,31 @@ public class Painter {
         drawLineString(g, lineString, color, new BasicStroke(strokeWidth));
     }
 
-    private void drawLineString(Graphics2D g, LineString lineString, Color color, Stroke stroke) {
+    private void drawLineString(Graphics2D g, LineString lineString, Color color, BasicStroke stroke) {
         g.setColor(color);
         g.setStroke(stroke);
-        for (int i = 0; i < lineString.getNumPoints() - 1; ++i) {
+
+        Path2D path = new Path2D.Double();
+
+        if (stroke.getLineWidth() > 1.0) {
+            drawPolygon(g, (com.vividsolutions.jts.geom.Polygon) lineString.buffer(((stroke.getLineWidth() - 1) * meterPerPixel) / 2), color, stroke);
+            return;
+        }
+
+        for (int i = 0; i < lineString.getNumPoints() - 1; i++) {
             Coordinate start = lineString.getCoordinateN(i);
             Coordinate end = lineString.getCoordinateN(i + 1);
-            g.drawLine((int) ((start.x - offsetX) / meterPerPixel), height - (int) ((start.y - offsetY) / meterPerPixel),
-                    (int) ((end.x - offsetX) / meterPerPixel), height - (int) ((end.y - offsetY) / meterPerPixel));
+
+            // Add the start point to the path for the first iteration
+            if (i == 0) {
+                path.moveTo((start.x - offsetX) / meterPerPixel, height - (start.y - offsetY) / meterPerPixel);
+            }
+
+            // Add the line to the path for each subsequent point
+            path.lineTo((end.x - offsetX) / meterPerPixel, height - (end.y - offsetY) / meterPerPixel);
         }
+
+        g.draw(path);
     }
 
     private void drawPoint(Graphics2D g, double pointX, double pointY, Color color, int size) {
