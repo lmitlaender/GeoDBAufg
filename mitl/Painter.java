@@ -9,9 +9,9 @@ import fu.keys.LSIClassCentreDB;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Path2D;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +112,7 @@ public class Painter {
             case Building -> drawGeometryBasedOnType(gLayers[4], geom, Color.MAGENTA, 3);
             case Water -> drawGeometryBasedOnType(gLayers[1], geom, Color.BLUE, 3);
             case Bridge -> drawGeometryBasedOnType(gLayers[2], geom, Color.darkGray, 3);
+            case Religious -> drawGeometryBasedOnType(gLayers[2], geom, Color.red, 3);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -143,7 +144,11 @@ public class Painter {
                 double midX = (StartX + EndX) / 2;
                 double midY = (StartY + EndY) / 2;
 
-                drawText(gLayers[8], name, midX, midY, Color.WHITE, 12, angle);
+                Shape textShape = getTextShape(gLayers[8], name, 12);
+                Shape centeredTextShape = centerTextShape(textShape, midX, midY);
+                drawTextShape(gLayers[8], centeredTextShape, Color.WHITE, angle);
+
+                //drawText(gLayers[8], name, midX, midY, Color.WHITE, 12, angle);
             }
         }
     }
@@ -174,6 +179,46 @@ public class Painter {
         } else {
             System.out.println("Unknown geometry type: " + geom.getClass());
         }
+    }
+
+    private Shape getTextShape(Graphics2D g, String text, int fontSize) {
+        Font font = new Font("Arial", Font.PLAIN, fontSize);
+        FontRenderContext frc = g.getFontRenderContext();
+        GlyphVector gv = font.createGlyphVector(frc, text);
+        Shape textShape = gv.getOutline();
+        return textShape;
+    }
+
+    private Shape centerTextShape(Shape textShape, double x, double y) {
+        Rectangle2D bounds = textShape.getBounds2D();
+
+        int[] renderPoint = {
+                (int) ((x - offsetX) / meterPerPixel),
+                height - (int) ((y - offsetY) / meterPerPixel)
+        };
+
+        AffineTransform transform = AffineTransform.getTranslateInstance(
+                renderPoint[0] - bounds.getCenterX(),
+                renderPoint[1] - bounds.getCenterY()
+        );
+        return transform.createTransformedShape(textShape);
+    }
+
+    private void drawTextShape(Graphics2D g, Shape textShape, Color color, double angle) {
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1));
+
+        if (angle < 0) {
+            angle += 180;
+        }
+        if (angle > 90) {
+            angle -= 180;
+        }
+
+        // Rotate the graphics context
+        g.rotate(Math.toRadians(angle), textShape.getBounds2D().getCenterX(), textShape.getBounds2D().getCenterY());
+        g.fill(textShape);
+        g.rotate(-Math.toRadians(angle), textShape.getBounds2D().getCenterX(), textShape.getBounds2D().getCenterY());
     }
 
     private void drawText(Graphics2D g, String text, double x, double y, Color color, int fontSize, double angle) {
