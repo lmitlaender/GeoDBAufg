@@ -19,7 +19,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
+
+import static mitl.LSIMapper.PaintType.Unspecified0Building;
 
 public class Mapout {
 
@@ -75,7 +78,7 @@ public class Mapout {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("""
-                    SELECT realname, lsiclass1, ST_AsEWKB(geom :: geometry)
+                    SELECT realname, lsiclass1, tags, ST_AsEWKB(geom :: geometry)
                     FROM domain WHERE ST_Intersects(geom :: geometry, ST_GeomFromText(?,4326))
                     ORDER BY ST_Length(geom) DESC
                     """
@@ -96,12 +99,25 @@ public class Mapout {
                 col = 1;
                 String realname = resultSet.getString(col++);
                 int lsiClass = resultSet.getInt(col++);
+                String tags = resultSet.getString(col++);
                 byte[] geomdata = resultSet.getBytes(col++);
                 Geometry geom = new WKBReader().read(geomdata);
 
                 Geometry projectedGeometry = utmProjection.projectGeometry(geom);
 
-                mapPainter.paintLSIClass(lsiClass, projectedGeometry, realname);
+                // if building=yes in tags, then paint it as a building - handles cases where both school and school area is done as same lsicode
+                var checkToDoList = new ArrayList<Integer>();
+                checkToDoList.add(0);
+                checkToDoList.addAll(LSIMapper.getLSICodeList(LSIClassCentreDB.lsiClass("EDUCATION"), true));
+                checkToDoList.add(LSIClassCentreDB.lsiClass("FEUERWEHR"));
+                checkToDoList.add(LSIClassCentreDB.lsiClass("POLIZEI"));
+                checkToDoList.addAll(LSIMapper.getLSICodeList(LSIClassCentreDB.lsiClass("BETREUUNG_KINDER"), true));
+                if (tags != null && checkToDoList.contains(lsiClass) && (tags.contains("building="))) {
+                    mapPainter.paintLSIClass(lsiClass, projectedGeometry, realname, Unspecified0Building);
+                } else {
+                    mapPainter.paintLSIClass(lsiClass, projectedGeometry, realname, null);
+                }
+
 
 
                 cnt++;

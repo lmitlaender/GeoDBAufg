@@ -2,8 +2,6 @@ package mitl;
 
 import fu.keys.LSIClassCentreDB;
 
-import java.awt.*;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,20 +12,59 @@ import java.util.stream.IntStream;
 public class LSIMapper {
 
     public static enum PaintType {
-        Autobahn,
-        Kraftfahrstrasse,
-        StandardStrasse,
-        FeldWaldWeg,
-        Auffahrt,
-        Rail,
-        Vegetation,
-        FootCyclePath,
-        Overnight,
-        Building,
-        Water,
-        Bridge,
-        Religious,
-        FlughafenStuffTest,
+        MedicalArea(900),
+        EducationArea(900),
+        FireDeparmentArea(900),
+        PoliceArea(900),
+        KindergartenArea(900),
+        ThemeParkArea(900),
+        GeneralGreen(1000),
+        Naherholungsgebiet(1000),
+        Cemetery(1500),
+        Forest(2000),
+        Sportplatz(3000),
+        Fussballplatz(3000),
+        Playground(3500),
+        Water(4000),
+        Bridge(5000),
+        Autobahn(6000),
+        Kraftfahrstrasse(6000),
+        StandardStrasse(6000),
+        FeldWaldWeg(6000),
+        Auffahrt(6000),
+        AdditionalSmallRoads(6000),
+        Rail(7000),
+        FootCyclePath(7000),
+        PedestrianZone(8000),
+        ATM(8500),
+        Overnight(8900),
+        Religious(8900),
+        Pharmacy(8900),
+        FinanceBuilding(8900),
+        Theatre(8900),
+        Cinema(8900),
+        ConcertHall(8900),
+        Museum(8900),
+        AnimalInstitutions(8900),
+        Court(8900),
+        CityHall(8900),
+        Building(9000),
+        Unspecified0Building(9000),
+        Gastronomy(9000),
+        Comercial(9000)
+        ;
+
+        private final int z;
+
+        // Constructor
+        PaintType(int z) {
+            this.z = z;
+        }
+
+        // Getter
+        public int getZ() {
+            return z;
+        }
     }
 
     // Static map for LSI lists
@@ -52,6 +89,7 @@ public class LSIMapper {
     }
 
     private static List<Integer> getLSICodeListForPaintType(PaintType type) {
+        List<Integer> list = new ArrayList<>();
         switch (type) {
             case Autobahn:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("AUTOBAHN"), false);
@@ -60,30 +98,109 @@ public class LSIMapper {
             case StandardStrasse:
                 return getStandardRoadLSICodeList();
             case FeldWaldWeg:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("FELD_WALD_WEG"), false);
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("FELD_WALD_WEG"), false);
+                list.add(LSIClassCentreDB.lsiClass("FELD_WALD_WEG_HISTORISCH"));
+                return list;
+            case AdditionalSmallRoads:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("ZUFAHRT"), false);
+                list.add(LSIClassCentreDB.lsiClass("PARKPLATZWEG"));
+                return list;
             case Auffahrt:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("KREUZUNGEN_KREISEL_AUFFAHRTEN"), true);
             case Rail:
                 return getRailLSICodeList();
-            case Vegetation:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("VEGETATION"), true);
+            case GeneralGreen:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("VEGETATION"), true);
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("WALD"), true));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("AGRICULTURAL"), true));
+                list.add(LSIClassCentreDB.lsiClass("WEIDELAND"));
+                list.add(LSIClassCentreDB.lsiClass("GRUENFLAECHE"));
+                list.add(LSIClassCentreDB.lsiClass("PARK"));
+                list.add(LSIClassCentreDB.lsiClass("GARTEN"));
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("WATT"));
+                return list;
             case FootCyclePath:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("FAHRRAD_FUSS_WEGE_ALL"), true);
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("FAHRRAD_FUSS_WEGE_ALL"), true);
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("FUSSGAENGERZONE"));
+                return list;
             case Overnight:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("UEBERNACHTUNGEN"), true);
             case Building:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("BUILDING"), true);
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("BUILDING"), true);
+                return list;
             case Water:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("WATER"), true);
             case Bridge:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("BRIDGE"), true);
             case Religious:
-                var startList = getLSICodeList(LSIClassCentreDB.lsiClass("KIRCHLICH"), true);
-                startList.add(LSIClassCentreDB.lsiClass("KIRCHE_HISTORIC"));
-                startList.add(LSIClassCentreDB.lsiClass("KLOSTER_HISTORIC"));
-                return startList;
-            case FlughafenStuffTest:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("FLUGHAFEN"), true);
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("KIRCHLICH"), true);
+                list.add(LSIClassCentreDB.lsiClass("KIRCHE_HISTORIC"));
+                list.add(LSIClassCentreDB.lsiClass("KLOSTER_HISTORIC"));
+                return list;
+            case Naherholungsgebiet:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("NAHERHOLUNGSGEBIET"), false);
+            case Sportplatz:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("SPORTPLATZ"), false);
+            case Fussballplatz:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FUSSBALLPLATZ"), false);
+            case Forest:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("WALD"), true);
+            case PedestrianZone:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FUSSGAENGERZONE"), false);
+            case Cemetery:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("FRIEDHOF"), false);
+                list.add(LSIClassCentreDB.lsiClass("FRIEDHOF_HISTORISCH"));
+                return list;
+            case MedicalArea:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("KRANKENHAUS"), false);
+                list.add(LSIClassCentreDB.lsiClass("KRANKENHAUS_ALLGEMEIN"));
+                return list;
+            case EducationArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("EDUCATION"), true);
+            case Pharmacy:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("APOTHEKE"), false);
+            case Unspecified0Building:
+                return new ArrayList<>();
+            case FinanceBuilding:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("BANK_KREDITUNTERNEHMEN"), true);
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("GELDAUTOMAT"));
+                return list;
+            case ATM:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("GELDAUTOMAT"), false);
+            case FireDeparmentArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FEUERWEHR"), false);
+            case PoliceArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("POLIZEI"), false);
+            case Theatre:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("THEATER"), false);
+            case Cinema:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("KINO"), false);
+            case ConcertHall:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("KONZERTHAUS"), false);
+            case Museum:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("MUSEUM_ALL"), true);
+            case AnimalInstitutions:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("TIERPARK"), true);
+            case ThemeParkArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FREIZEIPARK"), true);
+            case KindergartenArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("BETREUUNG_KINDER"), true);
+            case Court:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("GERICHT"), false);
+            case CityHall:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("RATHAUS"), false);
+                list.add(LSIClassCentreDB.lsiClass("RATHAUS_HISTORIC"));
+                return list;
+            case Playground:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("SPIELPLATZ"), false);
+            case Gastronomy:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY"), true);
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY_AREA"), true));
+                return list;
+            case Comercial:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("COMMERCIAL"), true);
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY"), true));
+                return list;
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }

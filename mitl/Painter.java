@@ -1,10 +1,6 @@
 package mitl;
 
-import com.vividsolutions.jts.awt.PointShapeFactory;
 import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.WKTWriter;
-import fu.keys.LSIClass;
 import fu.keys.LSIClassCentreDB;
 
 import javax.imageio.ImageIO;
@@ -15,14 +11,12 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
+import java.util.HashMap;
 
 public class Painter {
-    private BufferedImage[] zImages = new BufferedImage[10];
-    private Graphics2D[] gLayers = new Graphics2D[10];
+    private HashMap<Integer, BufferedImage> zImages = new HashMap<>();
+    private HashMap<Integer, Graphics2D> gLayers = new HashMap<>();
 
     private final int width;
     private final int height;
@@ -35,7 +29,8 @@ public class Painter {
         KRAFTFAHRSTRASSE(Color.MAGENTA, 8),
         STANDARD_STRASSE(Color.GRAY, 3),
         FELD_WALD_WEG(Color.GRAY, 3),
-        AUFFAHRT(Color.GRAY, 3);
+        AUFFAHRT(Color.GRAY, 3),
+        ZUFAHRTPARKPLATZWEG(Color.GRAY, 2);
 
         private final Color color;
         private final int width;
@@ -60,13 +55,12 @@ public class Painter {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
 
-        for (int i = 0; i < zImages.length; i++) {
-            zImages[i] = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            gLayers[i] = (Graphics2D) zImages[i].getGraphics();
-            gLayers[i].setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Antialiasing einschalten
-        }
-        gLayers[0].setColor(Color.WHITE);
-        gLayers[0].fillRect(0, 0, width, height);
+        var layer0 = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        var gLayer0 = (Graphics2D) layer0.getGraphics();
+        gLayer0.setColor(Color.WHITE);
+        gLayer0.fillRect(0, 0, width, height);
+        gLayers.put(0, gLayer0);
+        zImages.put(0, layer0);
     }
 
     public void saveImage(String filename) {
@@ -74,8 +68,14 @@ public class Painter {
         Graphics2D gFinal = (Graphics2D) finalImage.getGraphics();
         gFinal.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Antialiasing einschalten
 
-        for (int i = 0; i < 10; i++) {
-            gFinal.drawImage(zImages[i], 0, 0, null);
+        // Sort the layers by their keys
+        Integer[] keys = gLayers.keySet().toArray(new Integer[0]);
+        Arrays.sort(keys);
+        for (int i = 0; i < keys.length; i++) {
+            BufferedImage layer = zImages.get(keys[i]);
+            if (layer != null) {
+                gFinal.drawImage(layer, 0, 0, null);
+            }
         }
 
         try {
@@ -85,19 +85,16 @@ public class Painter {
         }
     }
 
-    public void paintLSIClass(int lsiClass, Geometry geom, String name) {
-        LSIMapper.PaintType paintType = LSIMapper.lsiCodeToPaintType(lsiClass);
+    public void paintLSIClass(int lsiClass, Geometry geom, String name, LSIMapper.PaintType paintType) {
+        if (paintType == null) {
+            paintType = LSIMapper.lsiCodeToPaintType(lsiClass);
+        }
 
         if (paintType == null) {
             //System.out.println("Unknown LSI code: " + lsiClass);
             return;
         }
-
-        if (lsiClass == LSIClassCentreDB.lsiClass("FUSSGAENGERZONE") && geom instanceof Polygon) {
-            // Don't print Fussgaengerzone polygons - we only want internal walking paths
-            return;
-        }
-
+        int z = paintType.getZ();
 
         switch (paintType) {
             case Autobahn -> drawStreet(geom, StreetCategory.AUTOBAHN, name);
@@ -105,14 +102,35 @@ public class Painter {
             case StandardStrasse -> drawStreet(geom, StreetCategory.STANDARD_STRASSE, name);
             case FeldWaldWeg -> drawStreet(geom, StreetCategory.FELD_WALD_WEG, name);
             case Auffahrt -> drawStreet(geom, StreetCategory.AUFFAHRT, name);
-            case Rail -> drawGeometryBasedOnType(gLayers[3], geom, Color.lightGray, 1);
-            case Vegetation -> drawGeometryBasedOnType(gLayers[1], geom, new Color(234, 255, 225), 5);
-            case FootCyclePath -> drawGeometryBasedOnType(gLayers[3], geom, Color.gray, 1);
-            case Overnight -> drawGeometryBasedOnType(gLayers[4], geom, Color.CYAN, 3);
-            case Building -> drawGeometryBasedOnType(gLayers[4], geom, Color.MAGENTA, 3);
-            case Water -> drawGeometryBasedOnType(gLayers[1], geom, Color.BLUE, 3);
-            case Bridge -> drawGeometryBasedOnType(gLayers[2], geom, Color.darkGray, 3);
-            case Religious -> drawGeometryBasedOnType(gLayers[2], geom, Color.red, 3);
+            case AdditionalSmallRoads -> drawStreet(geom, StreetCategory.ZUFAHRTPARKPLATZWEG, name);
+            case Rail -> drawGeometryBasedOnType(z, geom, Color.lightGray, 1, null);
+            case GeneralGreen, Naherholungsgebiet -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 51), 5, null);
+            case Forest -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 200), 5, null);
+            case Sportplatz, Fussballplatz -> drawGeometryBasedOnType(z, geom, new Color(136, 224, 190, 255), 5, new Color(89, 147, 125));
+            case Playground -> drawGeometryBasedOnType(z, geom, new Color(223, 252, 226, 255), 5, new Color(177, 201, 180));
+            case FootCyclePath -> drawGeometryBasedOnType(z, geom, Color.gray, 1, null);
+            case PedestrianZone -> drawGeometryBasedOnType(z, geom, new Color(239, 239, 239), 1, new Color(188, 188, 188));
+            case Overnight -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case Building, Unspecified0Building -> drawGeometryBasedOnType(z, geom, new Color(217, 208, 201), 3, new Color(197, 187, 177));
+            case Water -> drawGeometryBasedOnType(z, geom, Color.BLUE, 3, null);
+            case Bridge -> drawGeometryBasedOnType(z, geom, Color.darkGray, 3, null);
+            case Religious -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case Cemetery -> drawGeometryBasedOnType(z, geom, new Color(170, 203, 175), 3, new Color(105, 126, 109));
+            case MedicalArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
+            case EducationArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
+            case FireDeparmentArea -> drawGeometryBasedOnType(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188));
+            case PoliceArea -> drawGeometryBasedOnType(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188));
+            case Pharmacy -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case ATM -> drawGeometryBasedOnType(z, geom, Color.MAGENTA, 3, new Color(231, 231, 207));
+            case FinanceBuilding -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case Theatre, Cinema, ConcertHall, Museum, AnimalInstitutions -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case KindergartenArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
+            case ThemeParkArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
+            case Court -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case CityHall -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case Gastronomy -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 0, 150), 3, new Color(180, 165, 183));
+            case Comercial -> {drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, new Color(180, 165, 183));
+            System.out.println(name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));}
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -121,7 +139,7 @@ public class Painter {
         int width = (int) Math.floor((streetCategory.getWidth() / meterPerPixel) + 1);
         Color color = streetCategory.getColor();
 
-        drawGeometryBasedOnType(gLayers[3], geom, color, width);
+        drawGeometryBasedOnType(LSIMapper.PaintType.StandardStrasse.getZ(), geom, color, width, null);
 
         // Draw text segments if the width is greater than 12
         if (width > 12 && geom instanceof LineString lineString) {
@@ -144,44 +162,58 @@ public class Painter {
                 double midX = (StartX + EndX) / 2;
                 double midY = (StartY + EndY) / 2;
 
-                Shape textShape = getTextShape(gLayers[8], name, 12);
+                Shape textShape = getTextShape(9999999, name, 12);
                 Shape centeredTextShape = centerTextShape(textShape, midX, midY);
-                drawTextShape(gLayers[8], centeredTextShape, Color.WHITE, angle);
+                drawTextShape(9999999, centeredTextShape, Color.WHITE, angle);
 
-                //drawText(gLayers[8], name, midX, midY, Color.WHITE, 12, angle);
+                //drawText(9999999, name, midX, midY, Color.WHITE, 12, angle);
             }
         }
     }
 
-    private void drawGeometryBasedOnType(Graphics2D g, Geometry geom, Color color, int strokeWidth) {
-        drawGeometryBasedOnType(g, geom, color, new BasicStroke(strokeWidth));
+    private void drawGeometryBasedOnType(int z, Geometry geom, Color color, int strokeWidth, Color secondaryColor) {
+        drawGeometryBasedOnType(z, geom, color, new BasicStroke(strokeWidth), secondaryColor);
     }
 
-    private void drawGeometryBasedOnType(Graphics2D g, Geometry geom, Color color, BasicStroke stroke) {
+    private void drawGeometryBasedOnType(int z, Geometry geom, Color primaryColor, BasicStroke stroke, Color secondaryColor) {
         if (geom instanceof com.vividsolutions.jts.geom.Polygon polygon) {
-            drawPolygon(g, polygon, color, stroke);
+            drawPolygon(z, polygon, primaryColor, stroke, secondaryColor);
         } else if (geom instanceof com.vividsolutions.jts.geom.LineString lineString) {
-            drawLineString(g, lineString, color, stroke);
+            drawLineString(z, lineString, primaryColor, stroke);
         } else if (geom instanceof com.vividsolutions.jts.geom.Point point){
-            drawPoint(g, point.getX(), point.getY(), color, (int) stroke.getLineWidth());
+            drawPoint(z, point.getX(), point.getY(), primaryColor, (int) stroke.getLineWidth());
         } else if (geom instanceof com.vividsolutions.jts.geom.MultiPoint multiPoint) {
             for (Coordinate coordinate : multiPoint.getCoordinates()) {
-                drawPoint(g, coordinate.x, coordinate.y, color, (int) stroke.getLineWidth());
+                drawPoint(z, coordinate.x, coordinate.y, primaryColor, (int) stroke.getLineWidth());
             }
         } else if (geom instanceof com.vividsolutions.jts.geom.MultiLineString multiLineString) {
             for (int i = 0; i < multiLineString.getNumGeometries(); i++) {
-                drawLineString(g, (com.vividsolutions.jts.geom.LineString) multiLineString.getGeometryN(i), color, stroke);
+                drawLineString(z, (com.vividsolutions.jts.geom.LineString) multiLineString.getGeometryN(i), primaryColor, stroke);
             }
         } else if (geom instanceof com.vividsolutions.jts.geom.MultiPolygon multiPolygon) {
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-                drawGeometryBasedOnType(g, multiPolygon.getGeometryN(i), color, stroke);
+                drawGeometryBasedOnType(z, multiPolygon.getGeometryN(i), primaryColor, stroke, secondaryColor);
             }
         } else {
             System.out.println("Unknown geometry type: " + geom.getClass());
         }
     }
 
-    private Shape getTextShape(Graphics2D g, String text, int fontSize) {
+    Graphics2D getGraphicForZ(int z) {
+        if (gLayers.containsKey(z)) {
+            return gLayers.get(z);
+        } else {
+            BufferedImage layer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gLayer = (Graphics2D) layer.getGraphics();
+            gLayer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Antialiasing einschalten
+            zImages.put(z, layer);
+            gLayers.put(z, gLayer);
+            return gLayer;
+        }
+    }
+
+    private Shape getTextShape(int z, String text, int fontSize) {
+        Graphics2D g = getGraphicForZ(z);
         Font font = new Font("Arial", Font.PLAIN, fontSize);
         FontRenderContext frc = g.getFontRenderContext();
         GlyphVector gv = font.createGlyphVector(frc, text);
@@ -204,7 +236,8 @@ public class Painter {
         return transform.createTransformedShape(textShape);
     }
 
-    private void drawTextShape(Graphics2D g, Shape textShape, Color color, double angle) {
+    private void drawTextShape(int z, Shape textShape, Color color, double angle) {
+        Graphics2D g = getGraphicForZ(z);
         g.setColor(color);
         g.setStroke(new BasicStroke(1));
 
@@ -221,7 +254,8 @@ public class Painter {
         g.rotate(-Math.toRadians(angle), textShape.getBounds2D().getCenterX(), textShape.getBounds2D().getCenterY());
     }
 
-    private void drawText(Graphics2D g, String text, double x, double y, Color color, int fontSize, double angle) {
+    private void drawText(int z, String text, double x, double y, Color color, int fontSize, double angle) {
+        Graphics2D g = getGraphicForZ(z);
         g.setColor(color);
         g.setFont(new Font("Arial", Font.PLAIN, fontSize));
         int[] renderPoint = {
@@ -243,11 +277,12 @@ public class Painter {
         g.rotate(-Math.toRadians(angle), renderPoint[0], renderPoint[1]);
     }
 
-    private void drawPolygon(Graphics2D g, com.vividsolutions.jts.geom.Polygon polygon, Color color) {
-        drawPolygon(g, polygon, color, new BasicStroke(1));
+    private void drawPolygon(int z, com.vividsolutions.jts.geom.Polygon polygon, Color color, Color secondaryColor) {
+        drawPolygon(z, polygon, color, new BasicStroke(1), secondaryColor);
     }
 
-    private void drawPolygon(Graphics2D g, com.vividsolutions.jts.geom.Polygon polygon, Color color, Stroke stroke) {
+    private void drawPolygon(int z, com.vividsolutions.jts.geom.Polygon polygon, Color color, Stroke stroke, Color secondaryColor) {
+        Graphics2D g = getGraphicForZ(z);
         g.setColor(color);
         g.setStroke(stroke);
 
@@ -275,20 +310,28 @@ public class Painter {
 
         // Fill area
         g.fill(area);
+
+        // Draw outline if secondary color is provided
+        if (secondaryColor != null) {
+            g.setColor(secondaryColor);
+            g.setStroke(new BasicStroke(1));
+            g.draw(area);
+        }
     }
 
-    private void drawLineString(Graphics2D g, LineString lineString, Color color, int strokeWidth) {
-        drawLineString(g, lineString, color, new BasicStroke(strokeWidth));
+    private void drawLineString(int z, LineString lineString, Color color, int strokeWidth) {
+        drawLineString(z, lineString, color, new BasicStroke(strokeWidth));
     }
 
-    private void drawLineString(Graphics2D g, LineString lineString, Color color, BasicStroke stroke) {
+    private void drawLineString(int z, LineString lineString, Color color, BasicStroke stroke) {
+        Graphics2D g = getGraphicForZ(z);
         g.setColor(color);
         g.setStroke(stroke);
 
         Path2D path = new Path2D.Double();
 
         if (stroke.getLineWidth() > 1.0) {
-            drawPolygon(g, (com.vividsolutions.jts.geom.Polygon) lineString.buffer(((stroke.getLineWidth() - 1) * meterPerPixel) / 2), color, stroke);
+            drawPolygon(z, (com.vividsolutions.jts.geom.Polygon) lineString.buffer(((stroke.getLineWidth() - 1) * meterPerPixel) / 2), color, stroke, null);
             return;
         }
 
@@ -308,7 +351,8 @@ public class Painter {
         g.draw(path);
     }
 
-    private void drawPoint(Graphics2D g, double pointX, double pointY, Color color, int size) {
+    private void drawPoint(int z, double pointX, double pointY, Color color, int size) {
+        Graphics2D g = getGraphicForZ(z);
         g.setColor(color);
         g.fillOval((int) ((pointX - offsetX) / meterPerPixel), height - (int) ((pointY - offsetY) / meterPerPixel), size, size);
     }
