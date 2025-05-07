@@ -25,7 +25,9 @@ public class LSIMapper {
         Overnight,
         Building,
         Water,
-        Bridge
+        Bridge,
+        Religious,
+        FlughafenStuffTest,
     }
 
     // Static map for LSI lists
@@ -75,6 +77,13 @@ public class LSIMapper {
                 return getLSICodeList(LSIClassCentreDB.lsiClass("WATER"), true);
             case Bridge:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("BRIDGE"), true);
+            case Religious:
+                var startList = getLSICodeList(LSIClassCentreDB.lsiClass("KIRCHLICH"), true);
+                startList.add(LSIClassCentreDB.lsiClass("KIRCHE_HISTORIC"));
+                startList.add(LSIClassCentreDB.lsiClass("KLOSTER_HISTORIC"));
+                return startList;
+            case FlughafenStuffTest:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FLUGHAFEN"), true);
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }
