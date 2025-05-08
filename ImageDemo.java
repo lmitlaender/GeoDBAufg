@@ -71,7 +71,6 @@ public class ImageDemo {
         }
 
         try {
-
             // Leeres Bild anlegen
             BufferedImage image = new BufferedImage(512, 512, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = (Graphics2D) image.getGraphics();

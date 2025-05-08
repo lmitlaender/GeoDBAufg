@@ -14,6 +14,7 @@ public class LSIMapper {
     public static enum PaintType {
         MedicalArea(900),
         EducationArea(900),
+        UniversityArea(900),
         FireDeparmentArea(900),
         PoliceArea(900),
         KindergartenArea(900),
@@ -156,7 +157,13 @@ public class LSIMapper {
                 list.add(LSIClassCentreDB.lsiClass("KRANKENHAUS_ALLGEMEIN"));
                 return list;
             case EducationArea:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("EDUCATION"), true);
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("GRUND_SEKUNDARSCHULE"), true);
+                list.add(LSIClassCentreDB.lsiClass("BERUFSSCHULE"));
+                list.add(LSIClassCentreDB.lsiClass("EDUCATION"));
+                list.addAll(getLSICodeList(LSIClassCentreDB.lsiClass("BESONDERE_SCHULE"), true));
+                return list;
+            case UniversityArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("UNIVERSITY"), true);
             case Pharmacy:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("APOTHEKE"), false);
             case Unspecified0Building:

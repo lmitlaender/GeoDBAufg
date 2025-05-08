@@ -109,29 +109,57 @@ public class Painter {
             case Sportplatz, Fussballplatz -> drawGeometryBasedOnType(z, geom, new Color(136, 224, 190, 255), 5, new Color(89, 147, 125));
             case Playground -> drawGeometryBasedOnType(z, geom, new Color(223, 252, 226, 255), 5, new Color(177, 201, 180));
             case FootCyclePath -> drawGeometryBasedOnType(z, geom, Color.gray, 1, null);
-            case PedestrianZone -> drawGeometryBasedOnType(z, geom, new Color(239, 239, 239), 1, new Color(188, 188, 188));
+            case PedestrianZone -> drawSpecialArea(z, geom, new Color(239, 239, 239), 1, new Color(188, 188, 188), "pedestrianzone", name);
             case Overnight -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
             case Building, Unspecified0Building -> drawGeometryBasedOnType(z, geom, new Color(217, 208, 201), 3, new Color(197, 187, 177));
             case Water -> drawGeometryBasedOnType(z, geom, Color.BLUE, 3, null);
             case Bridge -> drawGeometryBasedOnType(z, geom, Color.darkGray, 3, null);
-            case Religious -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
-            case Cemetery -> drawGeometryBasedOnType(z, geom, new Color(170, 203, 175), 3, new Color(105, 126, 109));
-            case MedicalArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
-            case EducationArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
-            case FireDeparmentArea -> drawGeometryBasedOnType(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188));
-            case PoliceArea -> drawGeometryBasedOnType(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188));
-            case Pharmacy -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case Religious -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "religious", name);
+            case Cemetery -> drawSpecialArea(z, geom, new Color(170, 203, 175), 3, new Color(105, 126, 109), "graveyard", name);
+            case MedicalArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "hospital2", name);
+            case EducationArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "school", name);
+            case UniversityArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "university", name);
+            case FireDeparmentArea -> drawSpecialArea(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188), "firedepartment", name);
+            case PoliceArea -> drawSpecialArea(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188), "police", name);
+            case Pharmacy -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "pharmacy", name);
             case ATM -> drawGeometryBasedOnType(z, geom, Color.MAGENTA, 3, new Color(231, 231, 207));
-            case FinanceBuilding -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
-            case Theatre, Cinema, ConcertHall, Museum, AnimalInstitutions -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
-            case KindergartenArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
-            case ThemeParkArea -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207));
-            case Court -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
-            case CityHall -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case FinanceBuilding -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bank", name);
+            case Theatre, Cinema, ConcertHall, Museum, AnimalInstitutions -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "social", name);
+            case KindergartenArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "kindergarten", name);
+            case ThemeParkArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "social", name);
+            case Court -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "court", name);
+            case CityHall -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "tower", name);
             case Gastronomy -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 0, 150), 3, new Color(180, 165, 183));
             case Comercial -> {drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, new Color(180, 165, 183));
             System.out.println(name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));}
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
+        }
+    }
+
+    private void drawSpecialArea(int z, Geometry geom, Color color, int strokeWidth, Color secondaryColor, String icon, String name) {
+        drawGeometryBasedOnType(z, geom, color, new BasicStroke(strokeWidth), secondaryColor);
+
+        // Filters out for example inner paths or the like
+        if (!(geom instanceof com.vividsolutions.jts.geom.Polygon polygon || geom instanceof com.vividsolutions.jts.geom.MultiPolygon multiPolygon || geom instanceof com.vividsolutions.jts.geom.Point point)) {
+            return;
+        }
+
+        try {
+            BufferedImage iconImage = getIconWithTextImage(name, 20, icon, 50);
+
+            // Get render Point
+            double centerX = geom.getCentroid().getX();
+            double centerY = geom.getCentroid().getY();
+
+            int[] renderPoint = {
+                    (int) ((centerX - offsetX) / meterPerPixel),
+                    height - (int) ((centerY - offsetY) / meterPerPixel)
+            };
+
+            Graphics2D g = getGraphicForZ(99999999);
+            g.drawImage(iconImage, renderPoint[0] - iconImage.getWidth() / 2 - 5, renderPoint[1] - iconImage.getHeight() / 2 - 5, null);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -214,6 +242,10 @@ public class Painter {
 
     private Shape getTextShape(int z, String text, int fontSize) {
         Graphics2D g = getGraphicForZ(z);
+        return getTextShape(g, text, fontSize);
+    }
+
+    private Shape getTextShape(Graphics2D g, String text, int fontSize) {
         Font font = new Font("Arial", Font.PLAIN, fontSize);
         FontRenderContext frc = g.getFontRenderContext();
         GlyphVector gv = font.createGlyphVector(frc, text);
@@ -238,6 +270,10 @@ public class Painter {
 
     private void drawTextShape(int z, Shape textShape, Color color, double angle) {
         Graphics2D g = getGraphicForZ(z);
+        drawTextShape(g, textShape, color, angle);
+    }
+
+    private void drawTextShape(Graphics2D g, Shape textShape, Color color, double angle) {
         g.setColor(color);
         g.setStroke(new BasicStroke(1));
 
@@ -275,6 +311,74 @@ public class Painter {
         g.rotate(Math.toRadians(angle), renderPoint[0], renderPoint[1]);
         g.drawString(text, renderPoint[0], renderPoint[1]);
         g.rotate(-Math.toRadians(angle), renderPoint[0], renderPoint[1]);
+    }
+
+    private BufferedImage getScaledImage(BufferedImage img, int targetWidth) {
+        double scale = targetWidth / (double) img.getWidth();
+        Image tempImg = img.getScaledInstance(targetWidth, (int) (img.getHeight() * scale), Image.SCALE_SMOOTH);
+        BufferedImage scaledImage = new BufferedImage(tempImg.getWidth(null), tempImg.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D scaledGraphic = scaledImage.createGraphics();
+        scaledGraphic.drawImage(tempImg, 0, 0, null);
+        scaledGraphic.dispose();
+        return scaledImage;
+    }
+
+    private BufferedImage getIconWithTextImage(String text, int fontSize, String icon, int iconTargetWidth) throws IOException {
+        // get shape on random layer to have bounds
+        Shape textShape = getTextShape(-1, text, fontSize);
+        Rectangle textBounds = textShape.getBounds();
+
+        // Load and scale icon
+        BufferedImage scaledImage = getScaledImage(ImageIO.read(new File("icons" + File.separator + icon + ".png")), iconTargetWidth);
+
+        // Assume text is placed below the icon
+        int totalWidth = Math.max(scaledImage.getWidth(), textBounds.width);
+        int totalHeight = (int) (scaledImage.getHeight() + textBounds.height);
+
+        // Create combined image
+        BufferedImage combinedImage = new BufferedImage(totalWidth + 30, totalHeight + 30, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gCombined = combinedImage.createGraphics();
+        gCombined.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Draw text on correct graphic and transform
+        textShape = getTextShape(gCombined, text, fontSize);
+        AffineTransform transform = AffineTransform.getTranslateInstance(
+                (totalWidth - textBounds.width) / 2 + 5,
+                scaledImage.getHeight() + textBounds.getHeight() + 7
+        );
+        textShape = transform.createTransformedShape(textShape);
+
+        // Get bounding shape centered at the top of totalHeight
+        RoundRectangle2D imageRect = new RoundRectangle2D.Double((totalWidth - scaledImage.getWidth()) / 2 + 5, 5, scaledImage.getWidth(), scaledImage.getHeight(), 25, 25);
+        Area combinedArea = new Area(imageRect);
+        Rectangle2D tempRect = textShape.getBounds2D();
+        RoundRectangle2D textRect = new RoundRectangle2D.Double(tempRect.getX() - 2, tempRect.getY() - 2, tempRect.getWidth() + 4, tempRect.getHeight() + 4, 10, 10);
+        combinedArea.add(new Area(textRect));
+
+        // Make an outline
+        BasicStroke stroke = new BasicStroke(10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        Shape outline = stroke.createStrokedShape(combinedArea);
+
+        // Draw background
+        gCombined.setColor(new Color(0, 86, 159)); // green
+        gCombined.fill(outline);
+
+        // clear area of combinedArea
+        gCombined.setComposite(AlphaComposite.Clear);
+        gCombined.fill(combinedArea);
+        gCombined.setComposite(AlphaComposite.SrcOver);
+        gCombined.setColor(new Color(0, 114, 210, 130));
+        gCombined.fill(combinedArea);
+
+        // Draw icon
+        gCombined.drawImage(scaledImage, (totalWidth - scaledImage.getWidth()) / 2 + 5, 5, null);
+
+        // Draw text shape
+        drawTextShape(gCombined, textShape, Color.WHITE, 0);
+
+        gCombined.dispose();
+
+        return combinedImage;
     }
 
     private void drawPolygon(int z, com.vividsolutions.jts.geom.Polygon polygon, Color color, Color secondaryColor) {
