@@ -103,7 +103,7 @@ public class Painter {
             case FeldWaldWeg -> drawStreet(geom, StreetCategory.FELD_WALD_WEG, name);
             case Auffahrt -> drawStreet(geom, StreetCategory.AUFFAHRT, name);
             case AdditionalSmallRoads -> drawStreet(geom, StreetCategory.ZUFAHRTPARKPLATZWEG, name);
-            case Rail -> drawGeometryBasedOnType(z, geom, Color.lightGray, 1, null);
+            case Rail -> drawGeometryBasedOnType(z, geom, Color.lightGray, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] {4,2,8,2}, 0), null);
             case GeneralGreen, Naherholungsgebiet -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 51), 5, null);
             case Forest -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 200), 5, null);
             case Sportplatz, Fussballplatz -> drawGeometryBasedOnType(z, geom, new Color(136, 224, 190, 255), 5, new Color(89, 147, 125));
