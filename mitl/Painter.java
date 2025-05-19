@@ -85,10 +85,12 @@ public class Painter {
         }
     }
 
-    public void paintLSIClass(int lsiClass, Geometry geom, String name, LSIMapper.PaintType paintType) {
+    public void paintLSIClass(int lsiClass, int lsiClass2, int lsiClass3, Geometry geom, String name, LSIMapper.PaintType paintType) {
         if (paintType == null) {
             paintType = LSIMapper.lsiCodeToPaintType(lsiClass);
         }
+        LSIMapper.PaintType paintType2 = LSIMapper.lsiCodeToPaintType(lsiClass2);
+        LSIMapper.PaintType paintType3 = LSIMapper.lsiCodeToPaintType(lsiClass3);
 
         if (paintType == null) {
             //System.out.println("Unknown LSI code: " + lsiClass);
@@ -113,7 +115,13 @@ public class Painter {
             case Overnight -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
             case Building, Unspecified0Building -> drawGeometryBasedOnType(z, geom, new Color(217, 208, 201), 3, new Color(197, 187, 177));
             case Water -> drawGeometryBasedOnType(z, geom, Color.BLUE, 3, null);
-            case Bridge -> drawGeometryBasedOnType(z, geom, Color.darkGray, 3, null);
+            case Bridge -> {
+                drawBridge(z, geom, new Color(184, 184, 184), 3, null, paintTypeToStreetCategory(paintType2));
+                System.out.println("Bridge: " + name + ", paintType2: " + paintTypeToStreetCategory(paintType2));
+                if (paintType2 != null) {
+                    paintLSIClass(lsiClass2, 0, 0, geom, name, paintType2);
+                }
+            }
             case Religious -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "religious", name);
             case Cemetery -> drawSpecialArea(z, geom, new Color(170, 203, 175), 3, new Color(105, 126, 109), "graveyard", name);
             case MedicalArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "hospital2", name);
@@ -132,8 +140,28 @@ public class Painter {
             case Gastronomy -> drawGeometryBasedOnType(z, geom, new Color(255, 255, 0, 150), 3, new Color(180, 165, 183));
             case Comercial -> {drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, new Color(180, 165, 183));
             System.out.println(name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));}
+            case SwimmingAll -> {
+                System.out.println("SwimmingAll: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
+                drawGeometryBasedOnType(z, geom, new Color(194, 237, 255), 3, new Color(155, 189, 204));
+            }
+            case RailPlatform -> drawGeometryBasedOnType(z, geom, new Color(187, 187, 187), 1, new Color(110, 110, 110));
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
+    }
+
+    private StreetCategory paintTypeToStreetCategory(LSIMapper.PaintType paintType) {
+        if (paintType == null) {
+            return null;
+        }
+        return switch (paintType) {
+            case Autobahn -> StreetCategory.AUTOBAHN;
+            case Kraftfahrstrasse -> StreetCategory.KRAFTFAHRSTRASSE;
+            case StandardStrasse -> StreetCategory.STANDARD_STRASSE;
+            case FeldWaldWeg -> StreetCategory.FELD_WALD_WEG;
+            case Auffahrt -> StreetCategory.AUFFAHRT;
+            case AdditionalSmallRoads -> StreetCategory.ZUFAHRTPARKPLATZWEG;
+            default -> null;
+        };
     }
 
     private void drawSpecialArea(int z, Geometry geom, Color color, int strokeWidth, Color secondaryColor, String icon, String name) {
@@ -163,8 +191,26 @@ public class Painter {
         }
     }
 
+    private void drawBridge(int z, Geometry geom, Color color, int strokeWidth, Color secondaryColor, StreetCategory streetCategory) {
+        strokeWidth = (int)(5 / meterPerPixel);
+        if (streetCategory != null) {
+            strokeWidth = scaleLineWidth(streetCategory.getWidth()) + (int)(5 / meterPerPixel);
+        }
+        if (geom instanceof com.vividsolutions.jts.geom.Polygon polygon) {
+            drawPolygon(z, polygon, color, new BasicStroke(strokeWidth), secondaryColor);
+            return;
+        }
+        // Todo - draw lines, but what about the polygons it looks ugly if doing both.
+        //drawGeometryBasedOnType(z, geom, color, new BasicStroke(strokeWidth), secondaryColor);
+    }
+
+    private int scaleLineWidth(double lineWidth) {
+        int width = (int) Math.floor((lineWidth / meterPerPixel) + 1);
+        return width;
+    }
+
     private void drawStreet(Geometry geom, StreetCategory streetCategory, String name) {
-        int width = (int) Math.floor((streetCategory.getWidth() / meterPerPixel) + 1);
+        int width = scaleLineWidth(streetCategory.getWidth());
         Color color = streetCategory.getColor();
 
         drawGeometryBasedOnType(LSIMapper.PaintType.StandardStrasse.getZ(), geom, color, width, null);

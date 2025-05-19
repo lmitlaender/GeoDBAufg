@@ -34,6 +34,7 @@ public class LSIMapper {
         FeldWaldWeg(6000),
         Auffahrt(6000),
         AdditionalSmallRoads(6000),
+        RailPlatform(6500),
         Rail(7000),
         FootCyclePath(7000),
         PedestrianZone(8000),
@@ -52,7 +53,8 @@ public class LSIMapper {
         Building(9000),
         Unspecified0Building(9000),
         Gastronomy(9000),
-        Comercial(9000)
+        Comercial(9000),
+        SwimmingAll(10000)
         ;
 
         private final int z;
@@ -208,6 +210,11 @@ public class LSIMapper {
                 list = getLSICodeList(LSIClassCentreDB.lsiClass("COMMERCIAL"), true);
                 list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY"), true));
                 return list;
+            case SwimmingAll:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("SCHWIMMBAD_ALL"), true);
+            case RailPlatform:
+                // Todo - Bahnhof?
+                return getLSICodeList(LSIClassCentreDB.lsiClass("BAHNSTEIG"), false);
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }

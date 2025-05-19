@@ -78,7 +78,7 @@ public class Mapout {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("""
-                    SELECT realname, lsiclass1, tags, ST_AsEWKB(geom :: geometry)
+                    SELECT realname, lsiclass1, lsiclass2, lsiclass3, tags, ST_AsEWKB(geom :: geometry)
                     FROM domain WHERE ST_Intersects(geom :: geometry, ST_GeomFromText(?,4326))
                     ORDER BY ST_Length(geom) DESC
                     """
@@ -99,6 +99,8 @@ public class Mapout {
                 col = 1;
                 String realname = resultSet.getString(col++);
                 int lsiClass = resultSet.getInt(col++);
+                int lsiClass2 = resultSet.getInt(col++);
+                int lsiClass3 = resultSet.getInt(col++);
                 String tags = resultSet.getString(col++);
                 byte[] geomdata = resultSet.getBytes(col++);
                 Geometry geom = new WKBReader().read(geomdata);
@@ -113,9 +115,14 @@ public class Mapout {
                 checkToDoList.add(LSIClassCentreDB.lsiClass("POLIZEI"));
                 checkToDoList.addAll(LSIMapper.getLSICodeList(LSIClassCentreDB.lsiClass("BETREUUNG_KINDER"), true));
                 if (tags != null && checkToDoList.contains(lsiClass) && (tags.contains("building="))) {
-                    mapPainter.paintLSIClass(lsiClass, projectedGeometry, realname, Unspecified0Building);
-                } else {
-                    mapPainter.paintLSIClass(lsiClass, projectedGeometry, realname, null);
+                    mapPainter.paintLSIClass(lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, Unspecified0Building);
+                } else if (tags != null && tags.contains("man_made=bridge")) {
+                    // Recognize Bridge Polygons based on tag
+                    mapPainter.paintLSIClass(lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, LSIMapper.PaintType.Bridge);
+                }
+                else
+                {
+                    mapPainter.paintLSIClass(lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, null);
                 }
 
 
