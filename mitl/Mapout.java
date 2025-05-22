@@ -38,7 +38,6 @@ public class Mapout {
 
     public static void main(String[] args) {
         System.out.println("Mapout class is running");
-        Connection connection=null;
 
         if (args.length != 6) {
             System.out.println("False number of args. Supply in order: Latitude, Longitude, x, y, meter_x, filename");
@@ -53,23 +52,7 @@ public class Mapout {
         String filename = args[5];
         meterPerPixel = meter_x / x;
 
-        int cnt;
-        ResultSet resultSet;
-        Statement statement;
-
-        try {
-            /* Zugang zur Datenbank einrichten */
-            DBUtil.parseDBparams("127.0.0.1/5432/dbuser/dbuser/deproDBMittelfrankenPG",0);
-            connection=DBUtil.getConnection(0);
-            connection.setAutoCommit(false);  //Getting results based on a cursor
-            LSIClassCentreDB.initFromDB(connection);
-        }
-        catch (Exception e) {
-            System.out.println("Error initialising DB access: "+e.toString());
-            e.printStackTrace();
-            System.exit(1);
-        }
-
+        Connection connection = DeproDBHelper.getMainConnection();
 
         Geometry queryGeometry = get_query_geometry(lat, lon, x, y, meter_x, connection);
         System.out.println(new WKTWriter().writeFormatted(queryGeometry));
@@ -77,26 +60,17 @@ public class Mapout {
         mapPainter = new Painter(x, y, meterPerPixel, offsetX, offsetY);
 
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("""
-                    SELECT realname, lsiclass1, lsiclass2, lsiclass3, tags, ST_AsEWKB(geom :: geometry)
-                    FROM domain WHERE ST_Intersects(geom :: geometry, ST_GeomFromText(?,4326))
-                    ORDER BY ST_Length(geom) DESC
-                    """
-            );
+            ResultSet resultSet = DeproDBHelper.getMainResultSet(queryGeometry);
 
-            int col=1;
-            preparedStatement.setString(col++, new WKTWriter().write(queryGeometry));
-
-            System.out.println("Querying with "+preparedStatement.toString());
-
-            preparedStatement.setFetchSize(1000);
-
-            resultSet = preparedStatement.executeQuery();
-
-            cnt = 0;
+            if (resultSet == null) {
+                System.out.println("ResultSet of main query is null - no objects to draw");
+                mapPainter.saveImage(filename);
+                System.exit(1);
+            }
 
             while (resultSet.next()) {
-                col = 1;
+                int col = 1;
+                int d_id = resultSet.getInt(col++);
                 String realname = resultSet.getString(col++);
                 int lsiClass = resultSet.getInt(col++);
                 int lsiClass2 = resultSet.getInt(col++);
@@ -115,25 +89,21 @@ public class Mapout {
                 checkToDoList.add(LSIClassCentreDB.lsiClass("POLIZEI"));
                 checkToDoList.addAll(LSIMapper.getLSICodeList(LSIClassCentreDB.lsiClass("BETREUUNG_KINDER"), true));
                 if (tags != null && checkToDoList.contains(lsiClass) && (tags.contains("building="))) {
-                    mapPainter.paintLSIClass(lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, Unspecified0Building);
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, Unspecified0Building);
                 } else if (tags != null && tags.contains("man_made=bridge")) {
                     // Recognize Bridge Polygons based on tag
-                    mapPainter.paintLSIClass(lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, LSIMapper.PaintType.Bridge);
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, LSIMapper.PaintType.Bridge);
                 }
                 else
                 {
-                    mapPainter.paintLSIClass(lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, null);
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, null);
                 }
-
-
-
-                cnt++;
             }
             resultSet.close();
 
-            System.out.println("Schreibe Bild ...");
+            System.out.println("Writing image ...");
             mapPainter.saveImage(filename);
-            System.out.println("Bild geschrieben");
+            System.out.println("Image written to " + filename);
 
         }
         catch (Exception e) {

@@ -1,7 +1,11 @@
 package mitl;
 
 import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.io.WKBReader;
+import com.vividsolutions.jts.operation.polygonize.Polygonizer;
 import fu.keys.LSIClassCentreDB;
+import mitl.projection.UTMProjection;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -11,7 +15,10 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Painter {
@@ -23,6 +30,7 @@ public class Painter {
     private final double meterPerPixel;
     private final double offsetX;
     private final double offsetY;
+    private int currentDrawId = 0;
 
     public static enum StreetCategory {
         AUTOBAHN(Color.DARK_GRAY, 12),
@@ -85,7 +93,8 @@ public class Painter {
         }
     }
 
-    public void paintLSIClass(int lsiClass, int lsiClass2, int lsiClass3, Geometry geom, String name, LSIMapper.PaintType paintType) {
+    public void paintLSIClass(int d_id, int lsiClass, int lsiClass2, int lsiClass3, Geometry geom, String name, LSIMapper.PaintType paintType) {
+        this.currentDrawId = d_id;
         if (paintType == null) {
             paintType = LSIMapper.lsiCodeToPaintType(lsiClass);
         }
@@ -119,7 +128,7 @@ public class Painter {
                 drawBridge(z, geom, new Color(184, 184, 184), 3, null, paintTypeToStreetCategory(paintType2));
                 System.out.println("Bridge: " + name + ", paintType2: " + paintTypeToStreetCategory(paintType2));
                 if (paintType2 != null) {
-                    paintLSIClass(lsiClass2, 0, 0, geom, name, paintType2);
+                    paintLSIClass(d_id, lsiClass2, 0, 0, geom, name, paintType2);
                 }
             }
             case Religious -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "religious", name);
@@ -132,7 +141,7 @@ public class Painter {
             case Pharmacy -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "pharmacy", name);
             case ATM -> drawGeometryBasedOnType(z, geom, Color.MAGENTA, 3, new Color(231, 231, 207));
             case FinanceBuilding -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bank", name);
-            case Theatre, Cinema, ConcertHall, Museum, AnimalInstitutions -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "social", name);
+            case Theatre, Cinema, ConcertHall, Museum, AnimalInstitutions, CommunityLife -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "social", name);
             case KindergartenArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "kindergarten", name);
             case ThemeParkArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "social", name);
             case Court -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "court", name);
@@ -145,6 +154,9 @@ public class Painter {
                 drawGeometryBasedOnType(z, geom, new Color(194, 237, 255), 3, new Color(155, 189, 204));
             }
             case RailPlatform -> drawGeometryBasedOnType(z, geom, new Color(187, 187, 187), 1, new Color(110, 110, 110));
+            case Sand -> drawGeometryBasedOnType(z, geom, new Color(251, 236, 183), 3, new Color(199, 188, 145));
+            case Tower -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "tower", name);
+            case HistoricOthersArea -> drawSpecialArea(z, geom, new Color(0, 0, 0, 0), 3, new Color(0, 0, 0, 0), "tower", name);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -265,12 +277,99 @@ public class Painter {
                 drawLineString(z, (com.vividsolutions.jts.geom.LineString) multiLineString.getGeometryN(i), primaryColor, stroke);
             }
         } else if (geom instanceof com.vividsolutions.jts.geom.MultiPolygon multiPolygon) {
-            for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-                drawGeometryBasedOnType(z, multiPolygon.getGeometryN(i), primaryColor, stroke, secondaryColor);
-            }
+            drawMultiPolygon(z, multiPolygon, primaryColor, stroke, secondaryColor);
         } else {
             System.out.println("Unknown geometry type: " + geom.getClass());
         }
+    }
+
+    private void drawMultiPolygon(int z, com.vividsolutions.jts.geom.MultiPolygon multiPolygon, Color color, BasicStroke stroke, Color secondaryColor) {
+
+        String importId = DeproDBHelper.getImportId(currentDrawId);
+        if (importId != null) {
+            System.out.println("Import ID: " + importId + " Current Draw ID: " + currentDrawId);
+            Geometry outerGeometry = buildOuterGeometry(importId);
+            if (outerGeometry != null) {
+                Geometry innerGeometry = buildInnerGeometry(importId);
+                if (innerGeometry != null) {
+                    // Subtract inner geometry from outer geometry
+                    Geometry difference = outerGeometry.difference(innerGeometry);
+                    drawGeometryBasedOnType(z, difference, color, stroke, secondaryColor);
+                } else {
+                    drawGeometryBasedOnType(z, outerGeometry, new Color(0, 0, 0, 0), stroke, secondaryColor);
+                }
+                System.out.println("Rebuilt geometry for d_id: " + currentDrawId);
+                return;
+            }
+        }
+
+        for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+            drawPolygon(z, (com.vividsolutions.jts.geom.Polygon) multiPolygon.getGeometryN(i), color, stroke, secondaryColor);
+        }
+    }
+
+    private Geometry buildOuterGeometry(String importId) {
+        ResultSet outerComponents = DeproDBHelper.getRelationComponents("outer", importId);
+
+        try {
+            WKBReader wkbReader = new WKBReader();
+            Polygonizer polygonizer = new Polygonizer();
+            UTMProjection utmProjection = new UTMProjection();
+
+            while(outerComponents.next()) {
+                Geometry geom = wkbReader.read(outerComponents.getBytes(3));
+                geom = utmProjection.projectGeometry(geom);
+
+                if (geom instanceof GeometryCollection) {
+                    for (int i = 0; i < geom.getNumGeometries(); i++) {
+                        polygonizer.add(geom.getGeometryN(i));
+                    }
+                } else {
+                    polygonizer.add(geom);
+                }
+            }
+            outerComponents.close();
+
+            @SuppressWarnings("unchecked")
+            Collection<com.vividsolutions.jts.geom.Polygon> polygons = polygonizer.getPolygons();
+            if (polygons.isEmpty()) {
+                return null;
+            }
+
+            GeometryFactory geometryFactory = new GeometryFactory();
+            Geometry result = geometryFactory.buildGeometry(polygons).union();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Geometry buildInnerGeometry(String importId) {
+        ResultSet innerComponents = DeproDBHelper.getRelationComponents("inner", importId);
+        Geometry unionGeometry = null;
+
+        try {
+            WKBReader wkbReader = new WKBReader();
+            UTMProjection utmProjection = new UTMProjection();
+
+            while(innerComponents.next()) {
+                Geometry geom = wkbReader.read(innerComponents.getBytes(3));
+                geom = utmProjection.projectGeometry(geom);
+
+                if (unionGeometry == null) {
+                    unionGeometry = geom;
+                } else {
+                    unionGeometry = unionGeometry.union(geom);
+                }
+            }
+            innerComponents.close();
+
+            return unionGeometry;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     Graphics2D getGraphicForZ(int z) {

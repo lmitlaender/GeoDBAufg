@@ -19,8 +19,10 @@ public class LSIMapper {
         PoliceArea(900),
         KindergartenArea(900),
         ThemeParkArea(900),
+        HistoricOthersArea(900),
         GeneralGreen(1000),
         Naherholungsgebiet(1000),
+        Sand(1250),
         Cemetery(1500),
         Forest(2000),
         Sportplatz(3000),
@@ -47,9 +49,11 @@ public class LSIMapper {
         Cinema(8900),
         ConcertHall(8900),
         Museum(8900),
+        CommunityLife(8900),
         AnimalInstitutions(8900),
         Court(8900),
         CityHall(8900),
+        Tower(8900),
         Building(9000),
         Unspecified0Building(9000),
         Gastronomy(9000),
@@ -91,7 +95,7 @@ public class LSIMapper {
         return null;
     }
 
-    private static List<Integer> getLSICodeListForPaintType(PaintType type) {
+    public static List<Integer> getLSICodeListForPaintType(PaintType type) {
         List<Integer> list = new ArrayList<>();
         switch (type) {
             case Autobahn:
@@ -120,6 +124,8 @@ public class LSIMapper {
                 list.add(LSIClassCentreDB.lsiClass("GRUENFLAECHE"));
                 list.add(LSIClassCentreDB.lsiClass("PARK"));
                 list.add(LSIClassCentreDB.lsiClass("GARTEN"));
+                list.add(LSIClassCentreDB.lsiClass("HUNDEPARK"));
+                list.add(LSIClassCentreDB.lsiClass("GENERAL_PUBLIC_PLACE"));
                 list.removeIf(x -> x == LSIClassCentreDB.lsiClass("WATT"));
                 return list;
             case FootCyclePath:
@@ -143,7 +149,9 @@ public class LSIMapper {
             case Naherholungsgebiet:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("NAHERHOLUNGSGEBIET"), false);
             case Sportplatz:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("SPORTPLATZ"), false);
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("SPORTPLATZ"), false);
+                list.add(LSIClassCentreDB.lsiClass("GOLFPLATZ"));
+                return list;
             case Fussballplatz:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("FUSSBALLPLATZ"), false);
             case Forest:
@@ -215,6 +223,23 @@ public class LSIMapper {
             case RailPlatform:
                 // Todo - Bahnhof?
                 return getLSICodeList(LSIClassCentreDB.lsiClass("BAHNSTEIG"), false);
+            case Sand:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("SAND"), false);
+                list.add(LSIClassCentreDB.lsiClass("STRAND"));
+                list.add(LSIClassCentreDB.lsiClass("GOLFPLATZ_BUNKER"));
+                list.add(LSIClassCentreDB.lsiClass("BEACHVOLLEYBALL"));
+                return list;
+            case CommunityLife:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("GEMEINWESEN"), true);
+                return list;
+            case Tower:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("TURM"), true);
+            case HistoricOthersArea:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("HISTORIC"), true);
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("KIRCHE_HISTORIC"));
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("KLOSTER_HISTORIC"));
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("RATHAUS_HISTORIC"));
+                return list;
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }
