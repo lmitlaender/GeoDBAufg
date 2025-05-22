@@ -65,7 +65,7 @@ public class Painter {
 
         var layer0 = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         var gLayer0 = (Graphics2D) layer0.getGraphics();
-        gLayer0.setColor(Color.WHITE);
+        gLayer0.setColor(new Color(230, 230, 230));
         gLayer0.fillRect(0, 0, width, height);
         gLayers.put(0, gLayer0);
         zImages.put(0, layer0);
