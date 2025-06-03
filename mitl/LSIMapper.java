@@ -31,6 +31,7 @@ public class LSIMapper {
         Water(4000),
         Bridge(5000),
         Autobahn(6000),
+        Bundesstrasse(6000),
         Kraftfahrstrasse(6000),
         StandardStrasse(6000),
         FeldWaldWeg(6000),
@@ -58,6 +59,11 @@ public class LSIMapper {
         Unspecified0Building(9000),
         Gastronomy(9000),
         Comercial(9000),
+        Hairdresser(9000),
+        ClothingAndShoeShops(9000),
+        UnspecifiedShop(9000),
+        Bookstore(9000),
+        BicycleStore(9000),
         SwimmingAll(10000)
         ;
 
@@ -100,6 +106,8 @@ public class LSIMapper {
         switch (type) {
             case Autobahn:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("AUTOBAHN"), false);
+            case Bundesstrasse:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("BUNDESSTRASSE"), false);
             case Kraftfahrstrasse:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("KRAFTFAHRSTRASSE"), false);
             case StandardStrasse:
@@ -217,6 +225,14 @@ public class LSIMapper {
             case Comercial:
                 list = getLSICodeList(LSIClassCentreDB.lsiClass("COMMERCIAL"), true);
                 list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY"), true));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("SHOP"), false));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("FRISOER"), false));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("KLEIDUNG"), true));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("BUCHGESCHAEFT"), false));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("FAHRRADGESCHAEFT_ALL"), true));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GELDAUTOMAT"), false));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("BANK_KREDITUNTERNEHMEN"), true));
+
                 return list;
             case SwimmingAll:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("SCHWIMMBAD_ALL"), true);
@@ -240,6 +256,16 @@ public class LSIMapper {
                 list.removeIf(x -> x == LSIClassCentreDB.lsiClass("KLOSTER_HISTORIC"));
                 list.removeIf(x -> x == LSIClassCentreDB.lsiClass("RATHAUS_HISTORIC"));
                 return list;
+            case Hairdresser:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FRISOER"), false);
+            case ClothingAndShoeShops:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("KLEIDUNG"), true);
+            case UnspecifiedShop:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("SHOP"), false);
+            case Bookstore:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("BUCHGESCHAEFT"), false);
+            case BicycleStore:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FAHRRADGESCHAEFT_ALL"), true);
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }
@@ -271,6 +297,7 @@ public class LSIMapper {
         // add with lambda
         IntStream.of(LSIClassCentreDB.subClasses(standardRoadList.get(0)))
                 .forEach(standardRoadList::add);
+        standardRoadList.removeIf(x -> x == LSIClassCentreDB.lsiClass("BUNDESSTRASSE"));
 
         return standardRoadList;
     }
