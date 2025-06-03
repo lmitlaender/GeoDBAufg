@@ -64,6 +64,11 @@ public class LSIMapper {
         UnspecifiedShop(9000),
         Bookstore(9000),
         BicycleStore(9000),
+        Gallery(9000),
+        Florist(9000),
+        GiftShop(9000),
+        Bakery(9000),
+        Butcher(9000),
         SwimmingAll(10000)
         ;
 
@@ -266,6 +271,16 @@ public class LSIMapper {
                 return getLSICodeList(LSIClassCentreDB.lsiClass("BUCHGESCHAEFT"), false);
             case BicycleStore:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("FAHRRADGESCHAEFT_ALL"), true);
+            case Gallery:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("GALERIE"), false);
+            case Florist:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FLORIST"), false);
+            case GiftShop:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("GESCHENKARTIKEL"), false);
+            case Bakery:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("BAECKER"), false);
+            case Butcher:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FLEISCHER"), false);
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }

@@ -162,7 +162,9 @@ public class Painter {
             case Pharmacy -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "pharmacy", name, 5);
             case ATM -> drawGeometryBasedOnType(z, geom, Color.MAGENTA, 3, new Color(231, 231, 207));
             case FinanceBuilding -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bank", name, 5);
-            case Theatre, Cinema, ConcertHall, Museum, AnimalInstitutions, CommunityLife -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "social", name, 4);
+            case Theatre, Cinema, ConcertHall, CommunityLife -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "social", name, 4);
+            case Museum -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "museum", name, 4);
+            case AnimalInstitutions -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "zoo2", name, 4);
             case KindergartenArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "kindergarten", name, 4);
             case ThemeParkArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "social", name, 4);
             case Court -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "court", name, 4);
@@ -183,6 +185,11 @@ public class Painter {
             case UnspecifiedShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop", name, 1);
             case Bookstore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "library", name, 1);
             case BicycleStore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bike", name, 1);
+            case Gallery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "museum", name, 3);
+            case Florist -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop_flower", name, 2);
+            case GiftShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "present", name, 3);
+            case Bakery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "baker", name, 2);
+            case Butcher -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "butcher", name, 2);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -328,6 +335,7 @@ public class Painter {
             return;
         }
         if (geom instanceof LineString lineString) {
+            int distSinceLastText = Integer.MAX_VALUE;
             for (int i = 0; i < lineString.getNumPoints() - 1; i++) {
                 Coordinate start = lineString.getCoordinateN(i);
                 Coordinate end = lineString.getCoordinateN(i + 1);
@@ -338,7 +346,8 @@ public class Painter {
                 double EndY = end.y;
 
                 double length = Math.sqrt(Math.pow(EndX - StartX, 2) + Math.pow(EndY - StartY, 2)) / meterPerPixel;
-                if (length < name.length() * 6) {
+                if (length < name.length() * 6 || distSinceLastText < name.length() * 6 * 1.5) {
+                    distSinceLastText += length;
                     continue; // Skip if the length is too short
                 }
 
@@ -358,6 +367,7 @@ public class Painter {
                     drawTextShape(9999998, centeredTextShape, Color.WHITE, angle);
                 }
 
+                distSinceLastText = 0; // Reset distance after drawing text
                 //drawText(9999999, name, midX, midY, Color.WHITE, 12, angle);
             }
         }
