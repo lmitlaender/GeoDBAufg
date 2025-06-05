@@ -14,6 +14,7 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.util.*;
 
@@ -35,6 +36,11 @@ public class Painter {
             this.icon = icon;
         }
     }
+
+    private enum TextIconSide {
+        BOTTOM, RIGHT, TOP, LEFT
+    }
+
     private HashMap<Integer, BufferedImage> zImages = new HashMap<>();
     private HashMap<Integer, Graphics2D> gLayers = new HashMap<>();
 
@@ -114,6 +120,9 @@ public class Painter {
     public void paintLSIClass(int d_id, int lsiClass, int lsiClass2, int lsiClass3, Geometry geom, String name, LSIMapper.PaintType paintType) {
         this.currentDrawId = d_id;
         this.currentLsiClass = lsiClass;
+        if (name.length() <= 3) {
+            name = "";
+        }
         if (paintType == null) {
             paintType = LSIMapper.lsiCodeToPaintType(lsiClass);
         }
@@ -121,7 +130,6 @@ public class Painter {
         LSIMapper.PaintType paintType3 = LSIMapper.lsiCodeToPaintType(lsiClass3);
 
         if (paintType == null) {
-            //System.out.println("Unknown LSI code: " + lsiClass);
             return;
         }
         int z = paintType.getZ();
@@ -178,7 +186,7 @@ public class Painter {
             }
             case RailPlatform -> drawGeometryBasedOnType(z, geom, new Color(187, 187, 187), 1, new Color(110, 110, 110));
             case Sand -> drawGeometryBasedOnType(z, geom, new Color(251, 236, 183), 3, new Color(199, 188, 145));
-            case Tower -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "tower", name, 3);
+            case Tower -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "tower", name, 1);
             case HistoricOthersArea -> drawSpecialArea(z, geom, new Color(0, 0, 0, 0), 3, new Color(0, 0, 0, 0), "tower", name, 3);
             case Hairdresser -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "hairdresser", name, 1);
             case ClothingAndShoeShops -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop_shoes", name, 1);
@@ -186,69 +194,148 @@ public class Painter {
             case Bookstore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "library", name, 1);
             case BicycleStore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bike", name, 1);
             case Gallery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "museum", name, 3);
-            case Florist -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop_flower", name, 2);
-            case GiftShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "present", name, 3);
-            case Bakery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "baker", name, 2);
-            case Butcher -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "butcher", name, 2);
+            case Florist -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop_flower", name, 1);
+            case GiftShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "present", name, 2);
+            case Bakery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "baker", name, 1);
+            case Butcher -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "butcher", name, 1);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
+    }
+
+    private Set<String> getLabelPermutations(String labelText) {
+        // Get some text line permutations:
+        // 1. Keep the label text
+        // 2. Split on space but recombine the split results until each part is less than 15 characters and then place a "\n" between them
+
+        Set<String> permutations = new HashSet<>();
+
+        if (labelText.length() >= 15) {
+            String[] parts = labelText.split(" ");
+            StringBuilder currentLine = new StringBuilder();
+            StringBuilder currentSection = new StringBuilder();
+            for (String part : parts) {
+                // if part is punctuation only, skip it
+                if (part.matches("\\p{Punct}+")) {
+                    continue;
+                }
+
+                if (currentSection.length() + part.length() + 1 <= 20 || currentSection.length() == 0) {
+                    if (currentSection.length() > 0) {
+                        currentSection.append(" ");
+                    }
+                    currentSection.append(part);
+                } else {
+                    currentLine.append(currentSection.toString());
+                    currentLine.append("\n");
+                    currentSection.setLength(0); // Clear the current section
+                    currentSection.append(part); // Start a new section with the current part
+                }
+            }
+            if (currentLine.length() > 0) {
+                if (currentSection.length() > 0) {
+                    // if last char is not newline, append it
+                    if (currentLine.charAt(currentLine.length() - 1) != '\n') {
+                        currentLine.append("\n");
+                    }
+                    currentLine.append(currentSection.toString());
+                }
+
+                permutations.add(currentLine.toString());
+            }
+        }
+        if (labelText.length() <= 20 || permutations.isEmpty()) {
+            permutations.add(labelText);
+        }
+
+        return permutations;
     }
 
     private void drawLabels() {
         int priorityCutoff = (int) (meterPerPixel * width / 499);
         System.out.println("Priority cutoff for labels: " + priorityCutoff);
+        Graphics2D g = getGraphicForZ(100000000);
+        int iconTargetWidth = (int)(0.015 * width) + 1;
 
         while (!labelsToDraw.isEmpty() && labelsToDraw.peek().priority >= priorityCutoff) {
-
             Label label = labelsToDraw.poll();
             if (label.text.contains("_")) {
                 label.text = "";
             }
 
-            BufferedImage iconImage;
-            BufferedImage iconWithoutText;
-            Graphics2D g = getGraphicForZ(100000000);
+            Set<String> labelPermutations = getLabelPermutations(label.text);
 
-            int targetWidth = (int)(0.015 * width) + 1;
+            float lowestOverlap = 1.0f;
+            String bestPermutation = "";
+            BufferedImage bestLabelImage = null;
+            int[] bestRenderPoint = new int[2];
+            TextIconSide bestTextIconSide = TextIconSide.BOTTOM;
 
-            try {
-                iconImage = getLabel(label.text, label.fontSize, label.icon, targetWidth);
-                iconWithoutText = getLabel("", label.fontSize, label.icon, targetWidth);
-                if (label.priority <= 1) {
-                    iconImage = iconWithoutText; // If priority is low, use icon without text
+            // For each texticonside
+            for (TextIconSide textIconSide : TextIconSide.values()) {
+                // For all label Permutations test their overlap ratio
+                for (String permutation : labelPermutations) {
+                    BufferedImage labelImage;
+
+                    try {
+                        labelImage = getLabel(permutation, label.fontSize, label.icon, iconTargetWidth, textIconSide);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        continue;
+                    }
+
+                    int[] renderPoint = {
+                            (int) ((label.x - offsetX) / meterPerPixel) - labelImage.getWidth() / 2,
+                            height - (int) ((label.y - offsetY) / meterPerPixel) - labelImage.getHeight() / 2
+                    };
+
+                    float overlapRatio = getOverlapRatio(labelImage, renderPoint[0], renderPoint[1], zImages.get(100000000));
+
+                    if (overlapRatio < lowestOverlap) {
+                        lowestOverlap = overlapRatio;
+                        bestPermutation = permutation;
+                        bestLabelImage = labelImage;
+                        bestRenderPoint[0] = renderPoint[0];
+                        bestRenderPoint[1] = renderPoint[1];
+                        bestTextIconSide = textIconSide;
+                    }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                continue;
             }
 
-            // Place renderpoint so image is centered at point
-            int[] renderPoint = {
-                    (int) ((label.x - offsetX) / meterPerPixel) - iconImage.getWidth() / 2,
-                    height - (int) ((label.y - offsetY) / meterPerPixel) - iconImage.getHeight() / 2
-            };
-            float overlapRatio = getOverlapRatio(iconImage, renderPoint[0], renderPoint[1], zImages.get(100000000));
-            System.out.println(overlapRatio + " overlap ratio for label: " + label.text);
 
-            if (overlapRatio > 0.2) {
-                renderPoint[0] = (int) ((label.x - offsetX) / meterPerPixel) - iconWithoutText.getWidth() / 2;
-                renderPoint[1] = height - (int) ((label.y - offsetY) / meterPerPixel) - iconWithoutText.getHeight() / 2;
-                overlapRatio = getOverlapRatio(iconWithoutText, renderPoint[0], renderPoint[1], zImages.get(100000000));
-                System.out.println(overlapRatio + " overlap ratio for label without text: " + label.text);
-                if (overlapRatio > 0.2) {
-                    continue; // Skip drawing if overlap is too high
-                } else {
-                    // Draw without text
-                    g.drawImage(iconWithoutText, renderPoint[0], renderPoint[1], null);
-                    continue; // Skip drawing text if overlap is too high
-                }
+            if (bestLabelImage == null) {
+                continue; // No valid label found
             }
 
-            g.drawImage(iconImage, renderPoint[0], renderPoint[1], null);
+            System.out.println("Drawing label: " + bestPermutation + " at (" + bestRenderPoint[0] + ", " + bestRenderPoint[1] + ") with overlap: " + lowestOverlap);
+
+            // Draw the best label image, if overlap is over 0.25 try to fall back to icon only with label text ""
+            if (lowestOverlap < 0.25f) {
+                g.drawImage(bestLabelImage, bestRenderPoint[0], bestRenderPoint[1], null);
+            } else {
+                // Fallback to icon only
+                BufferedImage iconImage;
+                try {
+                    iconImage = getLabel("", label.fontSize, label.icon, iconTargetWidth, bestTextIconSide);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    continue;
+                }
+
+                if (getOverlapRatio(iconImage, bestRenderPoint[0], bestRenderPoint[1], zImages.get(100000000)) > 0.25f) {
+                    System.out.println("Skipping icon for label: " + label.text + " due to high overlap in every draw version");
+                    continue; // If the icon overlaps too much, skip drawing
+                }
+
+                bestRenderPoint[0] = (int) ((label.x - offsetX) / meterPerPixel) - iconImage.getWidth() / 2;
+                bestRenderPoint[1] = height - (int) ((label.y - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
+
+                g.drawImage(iconImage, bestRenderPoint[0], bestRenderPoint[1], null);
+            }
+
             g = getGraphicForZ(100000000);
             // DEBUG - Draw a point at the center of the text
-            //g.setColor(Color.RED);
-            //g.fillOval(renderPoint[0] + iconImage.getWidth() / 2 - 2, renderPoint[1] + iconImage.getHeight() / 2 - 2, 4, 4);
+            g.setColor(Color.RED);
+            g.fillOval(bestRenderPoint[0] + bestLabelImage.getWidth() / 2 - 2, bestRenderPoint[1] + bestLabelImage.getHeight() / 2 - 2, 4, 4);
         }
     }
 
@@ -305,7 +392,7 @@ public class Painter {
             name = LSIClassCentreDB.className(currentLsiClass);
         }
 
-        labelsToDraw.add(new Label(labelPriority, name, geom.getCentroid().getX(), geom.getCentroid().getY(), 12, icon));
+        labelsToDraw.add(new Label(labelPriority, name, geom.getCentroid().getX(), geom.getCentroid().getY(), 9, icon));
     }
 
     private void drawBridge(int z, Geometry geom, Color color, int strokeWidth, Color secondaryColor, StreetCategory streetCategory) {
@@ -361,10 +448,18 @@ public class Painter {
                 } else if (streetCategory == StreetCategory.BUNDESSTRASSE) {
                     //TODO - use Bundestrasse Icon
                 } else {
-                    Shape textShape = getTextShape(9999998, name, 12);
+                    Shape textShape = getTextShape(9999998, name, 10);
                     Shape centeredTextShape = centerTextShape(textShape, midX, midY);
+
+                    // Dont draw if text goes over borders
+                    Rectangle2D bounds = centeredTextShape.getBounds2D();
+                    if (bounds.getX() < 0 || bounds.getY() < 0 || bounds.getX() + bounds.getWidth() > width || bounds.getY() + bounds.getHeight() > height) {
+                        distSinceLastText = 0; // Reset distance if text goes over borders
+                        continue;
+                    }
+
                     //System.out.println("Drawing street name: " + name + " at angle: " + angle);
-                    drawTextShape(9999998, centeredTextShape, Color.WHITE, angle);
+                    drawTextShape(9999998, centeredTextShape, Color.WHITE, angle, Color.BLACK);
                 }
 
                 distSinceLastText = 0; // Reset distance after drawing text
@@ -507,11 +602,33 @@ public class Painter {
     }
 
     private Shape getTextShape(Graphics2D g, String text, int fontSize) {
+        String[] lines = text.split("\n");
         Font font = new Font("Arial", Font.PLAIN, fontSize);
         FontRenderContext frc = g.getFontRenderContext();
+
+        // Get Text shape for each line and combine them centered
+        Area combinedArea = null;
+        for (String line : lines) {
+            GlyphVector gv = font.createGlyphVector(frc, line);
+            Shape textShape = gv.getOutline();
+            if (combinedArea == null) {
+                combinedArea = new Area(textShape);
+            } else {
+                // Get current bounds and center the new text shape
+                Rectangle2D bounds = combinedArea.getBounds2D();
+                Shape centeredTextShape = AffineTransform.getTranslateInstance(
+                        bounds.getCenterX() - textShape.getBounds2D().getCenterX(),
+                        bounds.getMaxY() + fontSize
+                ).createTransformedShape(textShape);
+                combinedArea.add(new Area(centeredTextShape));
+            }
+        }
+
+        /*Font font = new Font("Arial", Font.PLAIN, fontSize);
+        FontRenderContext frc = g.getFontRenderContext();
         GlyphVector gv = font.createGlyphVector(frc, text);
-        Shape textShape = gv.getOutline();
-        return textShape;
+        Shape textShape = gv.getOutline();*/
+        return combinedArea;
     }
 
     private Shape centerTextShape(Shape textShape, double x, double y) {
@@ -529,15 +646,12 @@ public class Painter {
         return transform.createTransformedShape(textShape);
     }
 
-    private void drawTextShape(int z, Shape textShape, Color color, double angle) {
+    private void drawTextShape(int z, Shape textShape, Color color, double angle, Color outlineColor) {
         Graphics2D g = getGraphicForZ(z);
-        drawTextShape(g, textShape, color, angle);
+        drawTextShape(g, textShape, color, angle, outlineColor);
     }
 
-    private void drawTextShape(Graphics2D g, Shape textShape, Color color, double angle) {
-        g.setColor(color);
-        g.setStroke(new BasicStroke(1));
-
+    private void drawTextShape(Graphics2D g, Shape textShape, Color color, double angle, Color outlineColor) {
         if (angle < 0) {
             angle += 180;
         }
@@ -547,6 +661,13 @@ public class Painter {
 
         // Rotate the graphics context
         g.rotate(Math.toRadians(angle), textShape.getBounds2D().getCenterX(), textShape.getBounds2D().getCenterY());
+        if (outlineColor != null) {
+            g.setColor(outlineColor);
+            g.setStroke(new BasicStroke(2f));
+            g.draw(textShape);
+        }
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1));
         g.fill(textShape);
         g.rotate(-Math.toRadians(angle), textShape.getBounds2D().getCenterX(), textShape.getBounds2D().getCenterY());
     }
@@ -567,8 +688,6 @@ public class Painter {
         }
         renderPoint[1] += fontSize / 2;
 
-        System.out.println("Drawing text: " + text + " with angle: " + angle);
-
         g.rotate(Math.toRadians(angle), renderPoint[0], renderPoint[1]);
         g.drawString(text, renderPoint[0], renderPoint[1]);
         g.rotate(-Math.toRadians(angle), renderPoint[0], renderPoint[1]);
@@ -584,7 +703,7 @@ public class Painter {
         return scaledImage;
     }
 
-    private BufferedImage getLabel(String text, int fontSize, String icon, int iconTargetWidth) throws IOException {
+    private BufferedImage getLabel(String text, int fontSize, String icon, int iconTargetWidth, TextIconSide side) throws IOException {
         // get shape on random layer to have bounds
         Shape textShape = getTextShape(-1, text, fontSize);
         Rectangle textBounds = textShape.getBounds();
@@ -592,25 +711,55 @@ public class Painter {
         // Load and scale icon
         BufferedImage scaledImage = getScaledImage(ImageIO.read(new File("icons" + File.separator + icon + ".png")), iconTargetWidth);
 
+
+        int totalWidth = 0;
+        int totalHeight = 0;
         // Assume text is placed below the icon
-        int totalWidth = Math.max(scaledImage.getWidth(), textBounds.width);
-        int totalHeight = (int) (scaledImage.getHeight() + textBounds.height);
+        if (side == TextIconSide.LEFT || side == TextIconSide.RIGHT) {
+            totalWidth = (int) (scaledImage.getWidth() + textBounds.width);
+            totalHeight = Math.max(scaledImage.getHeight(), textBounds.height);
+        } else {
+            totalWidth = Math.max(scaledImage.getWidth(), textBounds.width);
+            totalHeight = (int) (scaledImage.getHeight() + textBounds.height);
+        }
 
         // Create combined image
-        BufferedImage combinedImage = new BufferedImage(totalWidth + 20, totalHeight + 20, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage combinedImage = new BufferedImage(totalWidth + 200, totalHeight + 200, BufferedImage.TYPE_INT_ARGB);
         Graphics2D gCombined = combinedImage.createGraphics();
         gCombined.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         // Draw text on correct graphic and transform
         textShape = getTextShape(gCombined, text, fontSize);
+        // place centered
+        Rectangle2D bounds = textShape.getBounds2D();
+
+        int xOffset = 0;
+        int yOffset = 0;
+
+        switch (side) {
+            case LEFT -> {
+                xOffset = -(int) (bounds.getWidth() / 2 + scaledImage.getWidth() / 2) - 2;
+            }
+            case RIGHT -> {
+                xOffset = (int) (bounds.getWidth() / 2 + scaledImage.getWidth() / 2) + 2;
+            }
+            case TOP -> {
+                yOffset = -(int) (bounds.getHeight() / 2 + scaledImage.getHeight() / 2) - 2;
+            }
+            case BOTTOM -> {
+                yOffset = (int) (bounds.getHeight() / 2 + scaledImage.getHeight() / 2) + 2;
+            }
+        }
+
         AffineTransform transform = AffineTransform.getTranslateInstance(
-                (totalWidth - textBounds.width) / 2 + 10,
-                scaledImage.getHeight() + textBounds.getHeight() + 10
+                (-(bounds.getX()) + (totalWidth + 200) / 2.0 - bounds.getWidth() / 2) + xOffset,
+                (-(bounds.getY()) + (totalHeight + 200) / 2.0 - bounds.getHeight() / 2) + yOffset
         );
         textShape = transform.createTransformedShape(textShape);
 
+
         // Get bounding shape centered at the top of totalHeight
-        RoundRectangle2D imageRect = new RoundRectangle2D.Double((totalWidth - scaledImage.getWidth()) / 2 + 10, 10, scaledImage.getWidth(), scaledImage.getHeight(), 25, 25);
+        RoundRectangle2D imageRect = new RoundRectangle2D.Double((totalWidth + 200) / 2.0 - scaledImage.getWidth() / 2.0, (totalHeight + 200) / 2.0 - scaledImage.getHeight() / 2.0, scaledImage.getWidth(), scaledImage.getHeight(), 25, 25);
         Area combinedArea = new Area(imageRect);
         Rectangle2D tempRect = textShape.getBounds2D();
         RoundRectangle2D textRect = new RoundRectangle2D.Double(tempRect.getX() - 2, tempRect.getY() - 2, tempRect.getWidth() + 4, tempRect.getHeight() + 4, 10, 10);
@@ -618,7 +767,7 @@ public class Painter {
             combinedArea.add(new Area(textRect));
 
             // Make an outline
-            BasicStroke stroke = new BasicStroke(10.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+            BasicStroke stroke = new BasicStroke(6.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
             Shape outline = stroke.createStrokedShape(combinedArea);
 
             // Draw background
@@ -634,12 +783,16 @@ public class Painter {
         }
 
         // Draw icon
-        gCombined.drawImage(scaledImage, (totalWidth - scaledImage.getWidth()) / 2 + 10, 10, null);
+        gCombined.drawImage(scaledImage, (int)((totalWidth + 200) / 2.0 - scaledImage.getWidth() / 2.0), (int) ((totalHeight + 200) / 2.0 - scaledImage.getHeight() / 2.0), null);
 
         // Draw text shape
-        drawTextShape(gCombined, textShape, Color.WHITE, 0);
+        drawTextShape(gCombined, textShape, Color.WHITE, 0, null);
+        // oval in middle of BufferedImage
+        gCombined.setColor(Color.MAGENTA);
+        gCombined.fillOval((totalWidth + 200) / 2, (totalHeight + 200) / 2, 4, 4);
 
         gCombined.dispose();
+
 
         return combinedImage;
     }
