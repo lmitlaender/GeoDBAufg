@@ -69,6 +69,7 @@ public class LSIMapper {
         GiftShop(9000),
         Bakery(9000),
         Butcher(9000),
+        TrainStation(9500),
         SwimmingAll(10000)
         ;
 
@@ -242,8 +243,9 @@ public class LSIMapper {
             case SwimmingAll:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("SCHWIMMBAD_ALL"), true);
             case RailPlatform:
-                // Todo - Bahnhof?
                 return getLSICodeList(LSIClassCentreDB.lsiClass("BAHNSTEIG"), false);
+            case TrainStation:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("BAHNHOF"), false);
             case Sand:
                 list = getLSICodeList(LSIClassCentreDB.lsiClass("SAND"), false);
                 list.add(LSIClassCentreDB.lsiClass("STRAND"));

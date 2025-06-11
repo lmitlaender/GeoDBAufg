@@ -133,6 +133,10 @@ public class Painter {
             return;
         }
         int z = paintType.getZ();
+        if (paintType == LSIMapper.PaintType.TrainStation && name.isEmpty() || paintType == LSIMapper.PaintType.Comercial) {
+            // If the paint type is TrainStation and no name is given, use the LSI class name
+            System.out.println("Drawing on layer " + z + " with name: " + LSIClassCentreDB.className(lsiClass));
+        }
 
         switch (paintType) {
             case Autobahn -> drawStreet(geom, StreetCategory.AUTOBAHN, name);
@@ -198,6 +202,7 @@ public class Painter {
             case GiftShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "present", name, 2);
             case Bakery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "baker", name, 1);
             case Butcher -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "butcher", name, 1);
+            case TrainStation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "trainstation", name, 5);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }

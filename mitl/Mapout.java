@@ -81,6 +81,36 @@ public class Mapout {
 
                 Geometry projectedGeometry = utmProjection.projectGeometry(geom);
 
+                if (tags != null && tags.contains("level=")) {
+                    // Get level number between "level=" and ","
+                    String level = tags.substring(tags.indexOf("level=") + 6);
+                    if (level.contains(",")) {
+                        level = level.substring(0, level.indexOf(","));
+                    }
+                    // Level might now be a list of levels "1;2;3", we want the highest one
+                    String[] levels = level.split(";");
+                    int levelNumber = -999;
+                    for (String l : levels) {
+                        try {
+                            int lnum = Integer.parseInt(l);
+                            if (lnum > levelNumber) {
+                                levelNumber = lnum;
+                            }
+                        } catch (NumberFormatException e) {
+                            // Ignore non-numeric levels
+                        }
+                    }
+
+                    // If it is a negative level and a polygon we represent it as a point object so that underground shops get marked, but not drawn.
+                    if (levelNumber < 0 && projectedGeometry instanceof Polygon) {
+                        System.out.println("Repurposing underground polygon (realname: " + realname + ", level: " + levelNumber + ", lsiClass1: " + LSIClassCentreDB.className(lsiClass) + ") to point object for marking only.");
+                        // Convert polygon to point by taking the centroid
+                        projectedGeometry = projectedGeometry.getCentroid();
+                        // Set the geometry type to point
+                        projectedGeometry.setUserData("Point");
+                    }
+                }
+
                 // if building=yes in tags, then paint it as a building - handles cases where both school and school area is done as same lsicode
                 var checkToDoList = new ArrayList<Integer>();
                 checkToDoList.add(0);
@@ -88,7 +118,10 @@ public class Mapout {
                 checkToDoList.add(LSIClassCentreDB.lsiClass("FEUERWEHR"));
                 checkToDoList.add(LSIClassCentreDB.lsiClass("POLIZEI"));
                 checkToDoList.addAll(LSIMapper.getLSICodeList(LSIClassCentreDB.lsiClass("BETREUUNG_KINDER"), true));
-                if (tags != null && checkToDoList.contains(lsiClass) && (tags.contains("building="))) {
+                if (tags != null && checkToDoList.contains(lsiClass) && tags.contains("building=train_station")) {
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, LSIMapper.PaintType.TrainStation);
+                }
+                else if (tags != null && checkToDoList.contains(lsiClass) && (tags.contains("building="))) {
                     mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, Unspecified0Building);
                 } else if (tags != null && tags.contains("man_made=bridge")) {
                     // Recognize Bridge Polygons based on tag
