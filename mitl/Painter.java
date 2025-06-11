@@ -153,7 +153,7 @@ public class Painter {
             case Playground -> drawGeometryBasedOnType(z, geom, new Color(223, 252, 226, 255), 5, new Color(177, 201, 180));
             case FootCyclePath -> drawGeometryBasedOnType(z, geom, Color.gray, 1, null);
             case PedestrianZone -> drawSpecialArea(z, geom, new Color(239, 239, 239), 1, new Color(188, 188, 188), "pedestrianzone", name, 4);
-            case Overnight -> drawGeometryBasedOnType(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183));
+            case Overnight -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "hotel", name, 3);
             case Building, Unspecified0Building -> drawGeometryBasedOnType(z, geom, new Color(217, 208, 201), 3, new Color(197, 187, 177));
             case Water -> drawGeometryBasedOnType(z, geom, Color.BLUE, 3, null);
             case Bridge -> {
@@ -203,6 +203,7 @@ public class Painter {
             case Bakery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "baker", name, 1);
             case Butcher -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "butcher", name, 1);
             case TrainStation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "trainstation", name, 5);
+            case Post -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "post", name, 5);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -355,6 +356,11 @@ public class Painter {
                     labelPixels++;
                     int maskX = x + i;
                     int maskY = y + j;
+                    // If label is out of bounds high ratio to not print
+                    if (maskX < 0 || maskY < 0 || maskX >= mask.getWidth() || maskY >= mask.getHeight()) {
+                        return 1.0f;
+                    }
+
                     if (maskX >= 0 && maskY >= 0 && maskX < mask.getWidth() && maskY < mask.getHeight()) {
                         int maskAlpha = (mask.getRGB(maskX, maskY) >> 24) & 0xff;
                         if (maskAlpha != 0) {

@@ -60,7 +60,7 @@ public class DeproDBHelper {
             PreparedStatement preparedStatement = connection.prepareStatement("""
                     SELECT d_id, realname, lsiclass1, lsiclass2, lsiclass3, tags, ST_AsEWKB(geom :: geometry)
                     FROM domain WHERE ST_Intersects(geom :: geometry, ST_GeomFromText(?,4326))
-                    ORDER BY ST_Length(geom) DESC
+                    ORDER BY d_id ASC
                     """
             );
 

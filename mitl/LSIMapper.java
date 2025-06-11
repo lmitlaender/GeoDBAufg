@@ -55,6 +55,7 @@ public class LSIMapper {
         Court(8900),
         CityHall(8900),
         Tower(8900),
+        Post(8900),
         Building(9000),
         Unspecified0Building(9000),
         Gastronomy(9000),
@@ -238,6 +239,8 @@ public class LSIMapper {
                 list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("FAHRRADGESCHAEFT_ALL"), true));
                 list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GELDAUTOMAT"), false));
                 list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("BANK_KREDITUNTERNEHMEN"), true));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("UEBERNACHTUNGEN"), true));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("POST"), true));
 
                 return list;
             case SwimmingAll:
@@ -283,6 +286,10 @@ public class LSIMapper {
                 return getLSICodeList(LSIClassCentreDB.lsiClass("BAECKER"), false);
             case Butcher:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("FLEISCHER"), false);
+            case Post:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("POST"), true);
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("BRIEFKASTEN"));
+                return list;
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }
