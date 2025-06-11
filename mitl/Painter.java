@@ -14,7 +14,6 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.util.*;
 
@@ -149,7 +148,7 @@ public class Painter {
             case Rail -> drawGeometryBasedOnType(z, geom, Color.lightGray, new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] {4,2,8,2}, 0), null);
             case GeneralGreen, Naherholungsgebiet -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 51), 5, null);
             case Forest -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 200), 5, null);
-            case Sportplatz, Fussballplatz -> drawGeometryBasedOnType(z, geom, new Color(136, 224, 190, 255), 5, new Color(89, 147, 125));
+            case Sportplatz, Fussballplatz -> drawSpecialArea(z, geom, new Color(136, 224, 190, 255), 5, new Color(89, 147, 125), "sports", name, 3);
             case Playground -> drawGeometryBasedOnType(z, geom, new Color(223, 252, 226, 255), 5, new Color(177, 201, 180));
             case FootCyclePath -> drawGeometryBasedOnType(z, geom, Color.gray, 1, null);
             case PedestrianZone -> drawSpecialArea(z, geom, new Color(239, 239, 239), 1, new Color(188, 188, 188), "pedestrianzone", name, 4);
@@ -194,7 +193,7 @@ public class Painter {
             case HistoricOthersArea -> drawSpecialArea(z, geom, new Color(0, 0, 0, 0), 3, new Color(0, 0, 0, 0), "tower", name, 3);
             case Hairdresser -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "hairdresser", name, 1);
             case ClothingAndShoeShops -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop_shoes", name, 1);
-            case UnspecifiedShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop", name, 1);
+            case GenericShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop", name, 1);
             case Bookstore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "library", name, 1);
             case BicycleStore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bike", name, 1);
             case Gallery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "museum", name, 3);
@@ -204,6 +203,15 @@ public class Painter {
             case Butcher -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "butcher", name, 1);
             case TrainStation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "trainstation", name, 5);
             case Post -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "post", name, 5);
+            case Toilet -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "toilet", name, 1);
+            case Cardealerships -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "cardealer", name, 1);
+            case CarWash -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "car", name, 1);
+            case GasStation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "gasstation", name, 3);
+            case TouristInformation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "touristinfo", name, 7);
+            case CommercialArea -> drawGeometryBasedOnType(z, geom, new Color(242, 218, 217), 3, new Color(191, 172, 171));
+            case PublicParking -> drawSpecialArea(z, geom, new Color(238, 238, 238), 3, new Color(187, 187, 187), "parkinglot", "", 3);
+            case CarParking -> drawSpecialArea(z, geom, new Color(217, 208, 201), 3, new Color(197, 187, 177), "parking_house", "", 3);
+            case TaxiRank -> drawSpecialArea(z, geom, new Color(238, 238, 238), 3, new Color(187, 187, 187), "taxi", "", 3);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
