@@ -13,6 +13,7 @@ public class LSIMapper {
 
     public static enum PaintType {
         CommercialArea(800),
+        GastronomyArea(850),
         MedicalArea(900),
         EducationArea(900),
         UniversityArea(900),
@@ -39,7 +40,10 @@ public class LSIMapper {
         FeldWaldWeg(6000),
         Auffahrt(6000),
         AdditionalSmallRoads(6000),
+        RoofWorkaround(6250),
         RailPlatform(6500),
+
+        Markets(6750),
         Rail(7000),
         FootCyclePath(7000),
         PedestrianZone(8000),
@@ -61,7 +65,10 @@ public class LSIMapper {
         Post(8900),
         Building(9000),
         Unspecified0Building(9000),
-        Gastronomy(9000),
+        Restaurants(9000),
+        Bar(9000),
+        Cafe(9000),
+        IceCreamShop(9000),
         Comercial(9000),
         Hairdresser(9000),
         ClothingAndShoeShops(9000),
@@ -79,6 +86,8 @@ public class LSIMapper {
         CarWash(9000),
         TouristInformation(9000),
         CarParking(9000),
+        Craftmanship(9000),
+        CommerceBuildings(9000),
         TrainStation(9500),
         SwimmingAll(10000)
         ;
@@ -234,9 +243,15 @@ public class LSIMapper {
                 return list;
             case Playground:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("SPIELPLATZ"), false);
-            case Gastronomy:
+            case Restaurants:
                 list = getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY"), true);
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY_AREA"), true));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY_AREA"), false));
+                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY_MORE"), false));
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("CATERING"));
+                list.add(LSIClassCentreDB.lsiClass("BIERGARTEN"));
+                list.add(LSIClassCentreDB.lsiClass("FASTFOOD"));
+                list.add(LSIClassCentreDB.lsiClass("RESTAURANT"));
+                list.add(LSIClassCentreDB.lsiClass("GASTRONOMY_MORE"));
                 return list;
             case Comercial:
                 list = getLSICodeList(LSIClassCentreDB.lsiClass("COMMERCIAL"), true);
@@ -351,6 +366,24 @@ public class LSIMapper {
                 return list;
             case TaxiRank:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("TAXISTAND"), false);
+            case RoofWorkaround:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("ROOF"), false);
+            case Bar:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("KNEIPE"), false);
+            case Cafe:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("CAFE"), false);
+            case IceCreamShop:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("EISDIELE"), false);
+            case GastronomyArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY_AREA"), true);
+            case Craftmanship:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("HANDWERK"), true);
+            case CommerceBuildings:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("COMMERCIAL_AREA"), true);
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("MARKTPLATZ"));
+                return list;
+            case Markets:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("MARKTPLATZ"), false);
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }

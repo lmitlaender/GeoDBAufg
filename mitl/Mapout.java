@@ -126,6 +126,11 @@ public class Mapout {
                 } else if (tags != null && tags.contains("man_made=bridge")) {
                     // Recognize Bridge Polygons based on tag
                     mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, LSIMapper.PaintType.Bridge);
+                } else if (tags != null && tags.contains("landuse=retail")) {
+                    // Workaround for retail landuse polygons that are falsely classified as SHOP.
+                    // landuse=retail should only be used for areas, not for single shops according to OSM specification, as such this should not impact real shops.
+                    System.out.println("Recognizing retail landuse for " + realname);
+                    mapPainter.paintLSIClass(d_id, LSIClassCentreDB.lsiClass("COMMERCIAL"), lsiClass2, lsiClass3, projectedGeometry, realname, null);
                 }
                 else
                 {

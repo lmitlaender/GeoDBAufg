@@ -10,6 +10,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+class QueryData {
+    public Connection connection;
+    public PreparedStatement preparedStatement;
+    public ResultSet resultSet;
+
+    public QueryData(Connection connection, PreparedStatement preparedStatement, ResultSet resultSet) {
+        this.connection = connection;
+        this.preparedStatement = preparedStatement;
+        this.resultSet = resultSet;
+    }
+
+    public void close() {
+        try {
+            if (resultSet != null && !resultSet.isClosed()) {
+                resultSet.close();
+            }
+            if (preparedStatement != null && !preparedStatement.isClosed()) {
+                preparedStatement.close();
+            }
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            System.out.println("Error closing resources: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
+
 public class DeproDBHelper {
     static String dbAccessString = "127.0.0.1/5432/dbuser/dbuser/deproDBMittelfrankenPG";
     static boolean mainConnectionInitialised = false;
@@ -80,9 +109,9 @@ public class DeproDBHelper {
     }
 
     public static String getImportId(int d_id) {
-        Connection connection = getMainConnection();
 
         try {
+            Connection connection = getMainConnection();
             PreparedStatement preparedStatement = connection.prepareStatement("""
                     SELECT importid
                     FROM domain WHERE d_id=?
@@ -99,6 +128,8 @@ public class DeproDBHelper {
                 importId = resultSet.getString(1);
             }
             resultSet.close();
+            preparedStatement.close();
+            connection.close();
 
             return importId;
         } catch (SQLException e) {
@@ -108,11 +139,10 @@ public class DeproDBHelper {
         }
     }
 
-    public static ResultSet getRelationComponents(String role, String importId) {
-        Connection connection = getMainConnection();
-        ResultSet resultSet = null;
+    public static QueryData getRelationComponents(String role, String importId) {
+        DBUtil.parseDBparams(dbAccessString, 1);
 
-        try {
+        try {Connection connection = DBUtil.getConnection(1);
             PreparedStatement preparedStatement = connection.prepareStatement("""
                     SELECT realname, role, ST_AsEWKB(domain.geom :: geometry)
                     FROM relation
@@ -127,8 +157,8 @@ public class DeproDBHelper {
 
             preparedStatement.setFetchSize(1000);
 
-            return preparedStatement.executeQuery();
-        } catch (SQLException e) {
+            return new QueryData(connection, preparedStatement, preparedStatement.executeQuery());
+        } catch (Exception e) {
             System.out.println("Error executing query: " + e.toString());
             e.printStackTrace();
             return null;
