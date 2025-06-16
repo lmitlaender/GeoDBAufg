@@ -58,13 +58,13 @@ public class Painter {
     private int currentLsiClass = 0;
 
     public static enum StreetCategory {
-        AUTOBAHN(Color.GRAY, 12),
-        KRAFTFAHRSTRASSE(Color.GRAY, 8),
-        BUNDESSTRASSE(Color.GRAY, 6),
-        STANDARD_STRASSE(Color.GRAY, 3),
-        FELD_WALD_WEG(Color.GRAY, 3),
-        AUFFAHRT(Color.GRAY, 3),
-        ZUFAHRTPARKPLATZWEG(Color.GRAY, 2);
+        AUTOBAHN(ColorPalette.ROAD_PRIMARY, 12),
+        KRAFTFAHRSTRASSE(ColorPalette.ROAD_PRIMARY, 8),
+        BUNDESSTRASSE(ColorPalette.ROAD_PRIMARY, 6),
+        STANDARD_STRASSE(ColorPalette.ROAD_PRIMARY, 3),
+        FELD_WALD_WEG(ColorPalette.ROAD_PRIMARY, 3),
+        AUFFAHRT(ColorPalette.ROAD_PRIMARY, 3),
+        ZUFAHRTPARKPLATZWEG(ColorPalette.ROAD_PRIMARY, 2);
 
         private final Color color;
         private final int width;
@@ -91,7 +91,7 @@ public class Painter {
 
         var layer0 = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         var gLayer0 = (Graphics2D) layer0.getGraphics();
-        gLayer0.setColor(new Color(230, 230, 230));
+        gLayer0.setColor(ColorPalette.MAP_BACKGROUND);
         gLayer0.fillRect(0, 0, width, height);
         gLayers.put(0, gLayer0);
         zImages.put(0, layer0);
@@ -163,83 +163,83 @@ public class Painter {
                         dashPattern,
                         2.0f
                 );
-                drawGeometryBasedOnType(z, geom, Color.lightGray, scaledStroke, null);
+                drawGeometryBasedOnType(z, geom, ColorPalette.RAIL_TRACK_PRIMARY, scaledStroke, null);
             }
-            case GeneralGreen, Naherholungsgebiet -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 51), 5, null);
-            case Forest -> drawGeometryBasedOnType(z, geom, new Color(11, 156, 49, 200), 5, null);
-            case Sportplatz, Fussballplatz -> drawSpecialArea(z, geom, new Color(136, 224, 190, 255), 5, new Color(89, 147, 125), "sports", name, 15);
-            case Playground -> drawGeometryBasedOnType(z, geom, new Color(223, 252, 226, 255), 5, new Color(177, 201, 180));
-            case FootCyclePath -> drawGeometryBasedOnType(z, geom, Color.gray, 1, null);
-            case PedestrianZone -> drawSpecialArea(z, geom, new Color(239, 239, 239), 1, new Color(188, 188, 188), "pedestrianzone", name, 20);
-            case Overnight -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "hotel", name, 15);
-            case Building, Unspecified0Building -> drawGeometryBasedOnType(z, geom, new Color(217, 208, 201), 3, new Color(197, 187, 177));
-            case Water -> drawGeometryBasedOnType(z, geom, Color.BLUE, 3, null);
+            case GeneralGreen, Naherholungsgebiet -> drawGeometryBasedOnType(z, geom, ColorPalette.GENERAL_GREEN, 5, null);
+            case Forest -> drawGeometryBasedOnType(z, geom, ColorPalette.FOREST_GREEN, 5, null);
+            case Sportplatz, Fussballplatz -> drawSpecialArea(z, geom, ColorPalette.SPORTS_GREEN_PRIMARY, 5, ColorPalette.SPORTS_GREEN_SECONDARY, "sports", name, 15);
+            case Playground -> drawGeometryBasedOnType(z, geom, ColorPalette.PLAYGROUND_GREEN_PRIMARY, 5, ColorPalette.PLAYGROUND_GREEN_SECONDARY);
+            case FootCyclePath -> drawGeometryBasedOnType(z, geom, ColorPalette.ROAD_PRIMARY, 1, null);
+            case PedestrianZone -> drawSpecialArea(z, geom, ColorPalette.PLAZA_PRIMARY, 1, ColorPalette.PLAZA_SECONDARY, "pedestrianzone", name, 20);
+            case Overnight -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "hotel", name, 15);
+            case Building, Unspecified0Building -> drawGeometryBasedOnType(z, geom, ColorPalette.BUILDING_PRIMARY, 3, ColorPalette.BUILDING_SECONDARY);
+            case Water -> drawGeometryBasedOnType(z, geom, ColorPalette.WATER_PRIMARY, 3, ColorPalette.WATER_SECONDARY);
             case Bridge -> {
-                drawBridge(z, geom, new Color(184, 184, 184), 3, null, paintTypeToStreetCategory(paintType2));
+                drawBridge(z, geom, ColorPalette.BRIDGE_PRIMARY, 3, ColorPalette.BRIDGE_SECONDARY, paintTypeToStreetCategory(paintType2));
 
                 // If there is a second paint type, draw it as well, for example unchanged streets
                 if (paintType2 != null) {
                     paintLSIClass(d_id, lsiClass2, 0, 0, geom, name, paintType2);
                 }
             }
-            case Religious -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "religious", name, 25);
-            case Cemetery -> drawSpecialArea(z, geom, new Color(170, 203, 175), 3, new Color(105, 126, 109), "graveyard", name, 25);
-            case MedicalArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "hospital2", name, 25);
-            case EducationArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "school", name, 20);
-            case UniversityArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "university", name, 25);
-            case FireDeparmentArea -> drawSpecialArea(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188), "firedepartment", name, 25);
-            case PoliceArea -> drawSpecialArea(z, geom, new Color(243, 227, 221), 3, new Color(246, 193, 188), "police", name, 25);
-            case Pharmacy -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "pharmacy", name, 25);
-            case ATM -> drawGeometryBasedOnType(z, geom, Color.MAGENTA, 3, new Color(231, 231, 207));
-            case FinanceBuilding -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bank", name, 25);
-            case Theatre, Cinema, ConcertHall, CommunityLife -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "social", name, 20);
-            case Museum -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "museum", name, 20);
-            case AnimalInstitutions -> drawSpecialArea(z, geom, new Color(196, 182, 171, 0), 20, new Color(196, 182, 171), "zoo2", name, 20);
-            case KindergartenArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "kindergarten", name, 15);
-            case ThemeParkArea -> drawSpecialArea(z, geom, new Color(255, 255, 220), 3, new Color(231, 231, 207), "social", name, 20);
-            case Court -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "court", name, 20);
-            case CityHall -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "tower", name, 20);
+            case Religious -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "religious", name, 25);
+            case Cemetery -> drawSpecialArea(z, geom, ColorPalette.CEMETERY_GREEN_PRIMARY, 3, ColorPalette.CEMETERY_GREEN_SECONDARY, "graveyard", name, 25);
+            case MedicalArea -> drawSpecialArea(z, geom, ColorPalette.YELLOW_AREA_PRIMARY, 3, ColorPalette.YELLOW_AREA_SECONDARY, "hospital2", name, 25);
+            case EducationArea -> drawSpecialArea(z, geom, ColorPalette.YELLOW_AREA_PRIMARY, 3, ColorPalette.YELLOW_AREA_SECONDARY, "school", name, 20);
+            case UniversityArea -> drawSpecialArea(z, geom, ColorPalette.YELLOW_AREA_PRIMARY, 3, ColorPalette.YELLOW_AREA_SECONDARY, "university", name, 25);
+            case FireDeparmentArea -> drawSpecialArea(z, geom, ColorPalette.RED_AREA_PRIMARY, 3, ColorPalette.RED_AREA_SECONDARY, "firedepartment", name, 25);
+            case PoliceArea -> drawSpecialArea(z, geom, ColorPalette.RED_AREA_PRIMARY, 3, ColorPalette.RED_AREA_SECONDARY, "police", name, 25);
+            case Pharmacy -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "pharmacy", name, 25);
+            case ATM -> drawSpecialArea(z, geom, ColorPalette.YELLOW_AREA_PRIMARY, 3, ColorPalette.YELLOW_AREA_SECONDARY, "cashpoint", "", 5);
+            case FinanceBuilding -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "bank", name, 25);
+            case Theatre, Cinema, ConcertHall, CommunityLife -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "social", name, 20);
+            case Museum -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "museum", name, 20);
+            case AnimalInstitutions -> drawSpecialArea(z, geom, ColorPalette.TRANSPARENT, 20, ColorPalette.SPECIAL_BUILDING_PRIMARY, "zoo2", name, 20);
+            case KindergartenArea -> drawSpecialArea(z, geom, ColorPalette.YELLOW_AREA_PRIMARY, 3, ColorPalette.YELLOW_AREA_SECONDARY, "kindergarten", name, 15);
+            case ThemeParkArea -> drawSpecialArea(z, geom, ColorPalette.YELLOW_AREA_PRIMARY, 3, ColorPalette.YELLOW_AREA_SECONDARY, "social", name, 20);
+            case Court -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "court", name, 20);
+            case CityHall -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "tower", name, 20);
             case Restaurants -> {
-                drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "restaurant", name, 5);
+                drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "restaurant", name, 5);
                 System.out.println("Gastronomy: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
             }
-            case Comercial -> drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, new Color(180, 165, 183));
+            case Comercial -> drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, ColorPalette.SPECIAL_BUILDING_SECONDARY);
             case SwimmingAll -> {
                 System.out.println("SwimmingAll: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
-                drawGeometryBasedOnType(z, geom, new Color(194, 237, 255), 3, new Color(155, 189, 204));
+                drawGeometryBasedOnType(z, geom, ColorPalette.SWIMMING_BLUE_PRIMARY, 3, ColorPalette.SWIMMING_BLUE_SECONDARY);
             }
-            case RailPlatform, RoofWorkaround -> drawGeometryBasedOnType(z, geom, new Color(187, 187, 187), 1, new Color(110, 110, 110));
-            case Sand -> drawGeometryBasedOnType(z, geom, new Color(251, 236, 183), 3, new Color(199, 188, 145));
-            case Tower -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "tower", name, 5);
-            case HistoricOthersArea -> drawSpecialArea(z, geom, new Color(0, 0, 0, 0), 3, new Color(0, 0, 0, 0), "tower", name, 15);
-            case Hairdresser -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "hairdresser", name, 5);
-            case ClothingAndShoeShops -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop_shoes", name, 5);
-            case GenericShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop", name, 5);
-            case Bookstore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "library", name, 5);
-            case BicycleStore -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "bike", name, 5);
-            case Gallery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "museum", name, 15);
-            case Florist -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop_flower", name, 5);
-            case GiftShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "present", name, 10);
-            case Bakery -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "baker", name, 3);
-            case Butcher -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "butcher", name, 3);
-            case TrainStation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "trainstation", name, 25);
-            case Post -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "post", name, 25);
-            case Toilet -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "toilet", name, 5);
-            case Cardealerships -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "cardealer", name, 5);
-            case CarWash -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "car", name, 5);
-            case GasStation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "gasstation", name, 15);
-            case TouristInformation -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "touristinfo", name, 25);
-            case CommercialArea -> drawGeometryBasedOnType(z, geom, new Color(242, 218, 217), 3, new Color(191, 172, 171));
-            case PublicParking -> drawSpecialArea(z, geom, new Color(238, 238, 238), 3, new Color(187, 187, 187), "parkinglot", "", 15);
-            case CarParking -> drawSpecialArea(z, geom, new Color(217, 208, 201), 3, new Color(197, 187, 177), "parking_house", "", 15);
-            case TaxiRank -> drawSpecialArea(z, geom, new Color(238, 238, 238), 3, new Color(187, 187, 187), "taxi", "", 15);
-            case GastronomyArea -> drawGeometryBasedOnType(z, geom, new Color(255, 245, 229), 3, new Color(204, 195, 183));
-            case Markets -> drawSpecialArea(z, geom, new Color(229, 247, 255), 3, new Color(210, 233, 247), "fontain", name, 15);
-            case Bar -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "drink", name, 5);
-            case Cafe -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "coffee", name, 5);
-            case IceCreamShop -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "icecream", name, 5);
-            case CommerceBuildings -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "shop", name, 5);
-            case Craftmanship -> drawSpecialArea(z, geom, new Color(196, 182, 171), 3, new Color(180, 165, 183), "craft", name, 5);
+            case RailPlatform, RoofWorkaround -> drawGeometryBasedOnType(z, geom, ColorPalette.RAIL_PLATFORM_PRIMARY, 1, ColorPalette.RAIL_PLATFORM_SECONDARY);
+            case Sand -> drawGeometryBasedOnType(z, geom, ColorPalette.SAND_PRIMARY, 3, ColorPalette.SAND_SECONDARY);
+            case Tower -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "tower", name, 5);
+            case HistoricOthersArea -> drawSpecialArea(z, geom, ColorPalette.TRANSPARENT, 3, ColorPalette.TRANSPARENT, "tower", name, 15);
+            case Hairdresser -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "hairdresser", name, 5);
+            case ClothingAndShoeShops -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "shop_shoes", name, 5);
+            case GenericShop -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "shop", name, 5);
+            case Bookstore -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "library", name, 5);
+            case BicycleStore -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "bike", name, 5);
+            case Gallery -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "museum", name, 15);
+            case Florist -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "shop_flower", name, 5);
+            case GiftShop -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "present", name, 10);
+            case Bakery -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "baker", name, 3);
+            case Butcher -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "butcher", name, 3);
+            case TrainStation -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "trainstation", name, 25);
+            case Post -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "post", name, 25);
+            case Toilet -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "toilet", "", 5);
+            case Cardealerships -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "cardealer", name, 5);
+            case CarWash -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "car", name, 5);
+            case GasStation -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "gasstation", name, 15);
+            case TouristInformation -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "touristinfo", name, 25);
+            case CommercialArea -> drawGeometryBasedOnType(z, geom, ColorPalette.COMMERCIAL_AREA_PRIMARY, 3, ColorPalette.COMMERCIAL_AREA_SECONDARY);
+            case PublicParking -> drawSpecialArea(z, geom, ColorPalette.PLAZA_PRIMARY, 3, ColorPalette.PLAZA_SECONDARY, "parkinglot", "", 15);
+            case CarParking -> drawSpecialArea(z, geom, ColorPalette.BUILDING_PRIMARY, 3, ColorPalette.BUILDING_SECONDARY, "parking_house", "", 15);
+            case TaxiRank -> drawSpecialArea(z, geom, ColorPalette.PLAZA_PRIMARY, 3, ColorPalette.PLAZA_SECONDARY, "taxi", "", 15);
+            case GastronomyArea -> drawGeometryBasedOnType(z, geom, ColorPalette.GASTRONOMY_AREA_PRIMARY, 3, ColorPalette.GASTRONOMY_AREA_SECONDARY);
+            case Markets -> drawSpecialArea(z, geom, ColorPalette.MARKET_PRIMARY, 3, ColorPalette.MARKET_SECONDARY, "fontain", name, 15);
+            case Bar -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "drink", name, 5);
+            case Cafe -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "coffee", name, 5);
+            case IceCreamShop -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "icecream", name, 5);
+            case CommerceBuildings -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "shop", name, 5);
+            case Craftmanship -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "craft", name, 5);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -304,7 +304,7 @@ public class Painter {
             }
             int importance = label.priority / 5 - 1;
             label.fontSize += importance;
-            int iconTargetWidth = (int)(0.015 * width) + 1 + importance;
+            int iconTargetWidth = (int)((0.015 * width) + (1 + importance) * (width / 1024.0));
 
             Set<String> labelPermutations = getLabelPermutations(label.text);
 
@@ -502,20 +502,20 @@ public class Painter {
                     //TODO - use Autobahn Icon
                 } else if (streetCategory == StreetCategory.BUNDESSTRASSE) {
                     //TODO - use Bundestrasse Icon
-                } else {
-                    Shape textShape = getTextShape(9999998, name, fontSize);
-                    Shape centeredTextShape = centerTextShape(textShape, midX, midY);
-
-                    // Dont draw if text goes over borders
-                    Rectangle2D bounds = centeredTextShape.getBounds2D();
-                    if (bounds.getX() < 0 || bounds.getY() < 0 || bounds.getX() + bounds.getWidth() > width || bounds.getY() + bounds.getHeight() > height) {
-                        distSinceLastText = 0; // Reset distance if text goes over borders
-                        continue;
-                    }
-
-                    //System.out.println("Drawing street name: " + name + " at angle: " + angle);
-                    drawTextShape(9999998, centeredTextShape, Color.WHITE, angle, Color.BLACK);
                 }
+                
+                Shape textShape = getTextShape(9999998, name, fontSize);
+                Shape centeredTextShape = centerTextShape(textShape, midX, midY);
+
+                // Dont draw if text goes over borders
+                Rectangle2D bounds = centeredTextShape.getBounds2D();
+                if (bounds.getX() < 0 || bounds.getY() < 0 || bounds.getX() + bounds.getWidth() > width || bounds.getY() + bounds.getHeight() > height) {
+                    distSinceLastText = 0; // Reset distance if text goes over borders
+                    continue;
+                }
+
+                //System.out.println("Drawing street name: " + name + " at angle: " + angle);
+                drawTextShape(9999998, centeredTextShape, Color.WHITE, angle, Color.BLACK);
 
                 distSinceLastText = 0; // Reset distance after drawing text
                 //drawText(9999999, name, midX, midY, Color.WHITE, 12, angle);
@@ -568,7 +568,7 @@ public class Painter {
                     Geometry difference = outerGeometry.difference(innerGeometry);
                     drawGeometryBasedOnType(z, difference, color, stroke, secondaryColor);
                 } else {
-                    drawGeometryBasedOnType(z, outerGeometry, new Color(0, 0, 0, 0), stroke, secondaryColor);
+                    drawGeometryBasedOnType(z, outerGeometry, ColorPalette.TRANSPARENT, stroke, secondaryColor);
                 }
                 System.out.println("Rebuilt geometry for d_id: " + currentDrawId);
                 return;
