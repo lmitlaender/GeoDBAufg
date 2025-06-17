@@ -135,7 +135,7 @@ public class ImageDemo {
             int[] x=new int[n];
             int[] y=new int[n];
 
-            for (int i=0;i<n;i++) {
+            for (int i=0;i<n;i++) {ficon
                 Coordinate coord=extring.getCoordinateN(i);
                 x[i]=(int)Math.round((coord.x-minX)*512/(maxX-minX));
                 y[i]=511-(int)Math.round((coord.y-minY)*512/(maxY-minY));

@@ -27,10 +27,12 @@ public class LSIMapper {
         Sand(1250),
         Cemetery(1500),
         Forest(2000),
+        AllotmentGarden(2500),
         Sportplatz(3000),
         Fussballplatz(3000),
         Playground(3500),
         Water(4000),
+        PrivateParking(4400),
         PublicParking(4500),
         Bridge(5000),
         Autobahn(6000),
@@ -360,6 +362,8 @@ public class LSIMapper {
                 list = getLSICodeList(LSIClassCentreDB.lsiClass("ALLGEMEINER_PARKPLATZ"), false);
                 list.add(LSIClassCentreDB.lsiClass("OEFFENTLICHER_PARKPLATZ"));
                 return list;
+            case PrivateParking:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("PARKPLATZ_PRIVAT"), false);
             case CarParking:
                 list = getLSICodeList(LSIClassCentreDB.lsiClass("PARKHAUS"), false);
                 list.add(LSIClassCentreDB.lsiClass("PARKHAUS_OEFFENTLICH"));
@@ -384,6 +388,8 @@ public class LSIMapper {
                 return list;
             case Markets:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("MARKTPLATZ"), false);
+            case AllotmentGarden:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("SCHREBERGAERTEN"), false);
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }

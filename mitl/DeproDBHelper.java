@@ -87,7 +87,7 @@ public class DeproDBHelper {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("""
-                    SELECT d_id, realname, lsiclass1, lsiclass2, lsiclass3, tags, ST_AsEWKB(geom :: geometry)
+                    SELECT d_id, realname, lsiclass1, lsiclass2, lsiclass3, tags, tags_name, ST_AsEWKB(geom :: geometry)
                     FROM domain WHERE ST_Intersects(geom :: geometry, ST_GeomFromText(?,4326))
                     ORDER BY d_id ASC
                     """

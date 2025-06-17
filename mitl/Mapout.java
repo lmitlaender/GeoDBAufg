@@ -76,6 +76,7 @@ public class Mapout {
                 int lsiClass2 = resultSet.getInt(col++);
                 int lsiClass3 = resultSet.getInt(col++);
                 String tags = resultSet.getString(col++);
+                String tags_name = resultSet.getString(col++);
                 byte[] geomdata = resultSet.getBytes(col++);
                 Geometry geom = new WKBReader().read(geomdata);
 
@@ -111,6 +112,15 @@ public class Mapout {
                     }
                 }
 
+                // Get Ref name mostly for special streets
+                String refName = null;
+                if (tags_name != null && tags_name.contains("ref=")) {
+                    refName = tags_name.substring(tags_name.indexOf("ref=") + 4);
+                    if (refName.contains(",")) {
+                        refName = refName.substring(0, refName.indexOf(","));
+                    }
+                }
+
                 // if building=yes in tags, then paint it as a building - handles cases where both school and school area is done as same lsicode
                 var checkToDoList = new ArrayList<Integer>();
                 checkToDoList.add(0);
@@ -119,22 +129,22 @@ public class Mapout {
                 checkToDoList.add(LSIClassCentreDB.lsiClass("POLIZEI"));
                 checkToDoList.addAll(LSIMapper.getLSICodeList(LSIClassCentreDB.lsiClass("BETREUUNG_KINDER"), true));
                 if (tags != null && checkToDoList.contains(lsiClass) && tags.contains("building=train_station")) {
-                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, LSIMapper.PaintType.TrainStation);
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, refName, LSIMapper.PaintType.TrainStation);
                 }
                 else if (tags != null && checkToDoList.contains(lsiClass) && (tags.contains("building="))) {
-                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, Unspecified0Building);
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, refName, Unspecified0Building);
                 } else if (tags != null && tags.contains("man_made=bridge")) {
                     // Recognize Bridge Polygons based on tag
-                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, LSIMapper.PaintType.Bridge);
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, refName, LSIMapper.PaintType.Bridge);
                 } else if (tags != null && tags.contains("landuse=retail")) {
                     // Workaround for retail landuse polygons that are falsely classified as SHOP.
                     // landuse=retail should only be used for areas, not for single shops according to OSM specification, as such this should not impact real shops.
                     System.out.println("Recognizing retail landuse for " + realname);
-                    mapPainter.paintLSIClass(d_id, LSIClassCentreDB.lsiClass("COMMERCIAL"), lsiClass2, lsiClass3, projectedGeometry, realname, null);
+                    mapPainter.paintLSIClass(d_id, LSIClassCentreDB.lsiClass("COMMERCIAL"), lsiClass2, lsiClass3, projectedGeometry, realname, refName, null);
                 }
                 else
                 {
-                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, null);
+                    mapPainter.paintLSIClass(d_id, lsiClass, lsiClass2, lsiClass3, projectedGeometry, realname, refName, null);
                 }
             }
             resultSet.close();

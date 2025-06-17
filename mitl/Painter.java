@@ -120,7 +120,7 @@ public class Painter {
         }
     }
 
-    public void paintLSIClass(int d_id, int lsiClass, int lsiClass2, int lsiClass3, Geometry geom, String name, LSIMapper.PaintType paintType) {
+    public void paintLSIClass(int d_id, int lsiClass, int lsiClass2, int lsiClass3, Geometry geom, String name, String refName, LSIMapper.PaintType paintType) {
         this.currentDrawId = d_id;
         this.currentLsiClass = lsiClass;
         if (name.length() <= 3) {
@@ -142,13 +142,13 @@ public class Painter {
         }
 
         switch (paintType) {
-            case Autobahn -> drawStreet(geom, StreetCategory.AUTOBAHN, name);
-            case Bundesstrasse -> drawStreet(geom, StreetCategory.BUNDESSTRASSE, name);
-            case Kraftfahrstrasse -> drawStreet(geom, StreetCategory.KRAFTFAHRSTRASSE, name);
-            case StandardStrasse -> drawStreet(geom, StreetCategory.STANDARD_STRASSE, name);
-            case FeldWaldWeg -> drawStreet(geom, StreetCategory.FELD_WALD_WEG, name);
-            case Auffahrt -> drawStreet(geom, StreetCategory.AUFFAHRT, name);
-            case AdditionalSmallRoads -> drawStreet(geom, StreetCategory.ZUFAHRTPARKPLATZWEG, name);
+            case Autobahn -> drawStreet(geom, StreetCategory.AUTOBAHN, name, refName);
+            case Bundesstrasse -> drawStreet(geom, StreetCategory.BUNDESSTRASSE, name, refName);
+            case Kraftfahrstrasse -> drawStreet(geom, StreetCategory.KRAFTFAHRSTRASSE, name, refName);
+            case StandardStrasse -> drawStreet(geom, StreetCategory.STANDARD_STRASSE, name, refName);
+            case FeldWaldWeg -> drawStreet(geom, StreetCategory.FELD_WALD_WEG, name, refName);
+            case Auffahrt -> drawStreet(geom, StreetCategory.AUFFAHRT, name, refName);
+            case AdditionalSmallRoads -> drawStreet(geom, StreetCategory.ZUFAHRTPARKPLATZWEG, name, refName);
             case Rail -> {
                 float scaleFactor = (float) width / 1024f;
                 float[] dashPattern = new float[] {8.0f, 4.0f};
@@ -168,7 +168,7 @@ public class Painter {
             case GeneralGreen, Naherholungsgebiet -> drawGeometryBasedOnType(z, geom, ColorPalette.GENERAL_GREEN, 5, null);
             case Forest -> drawGeometryBasedOnType(z, geom, ColorPalette.FOREST_GREEN, 5, null);
             case Sportplatz, Fussballplatz -> drawSpecialArea(z, geom, ColorPalette.SPORTS_GREEN_PRIMARY, 5, ColorPalette.SPORTS_GREEN_SECONDARY, "sports", name, 15);
-            case Playground -> drawGeometryBasedOnType(z, geom, ColorPalette.PLAYGROUND_GREEN_PRIMARY, 5, ColorPalette.PLAYGROUND_GREEN_SECONDARY);
+            case Playground -> drawSpecialArea(z, geom, ColorPalette.PLAYGROUND_GREEN_PRIMARY, 5, ColorPalette.PLAYGROUND_GREEN_SECONDARY, "playground", "", 10);
             case FootCyclePath -> drawGeometryBasedOnType(z, geom, ColorPalette.ROAD_PRIMARY, 1, null);
             case PedestrianZone -> drawSpecialArea(z, geom, ColorPalette.PLAZA_PRIMARY, 1, ColorPalette.PLAZA_SECONDARY, "pedestrianzone", name, 20);
             case Overnight -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "hotel", name, 15);
@@ -179,7 +179,7 @@ public class Painter {
 
                 // If there is a second paint type, draw it as well, for example unchanged streets
                 if (paintType2 != null) {
-                    paintLSIClass(d_id, lsiClass2, 0, 0, geom, name, paintType2);
+                    paintLSIClass(d_id, lsiClass2, 0, 0, geom, name, refName, paintType2);
                 }
             }
             case Religious -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "religious", name, 25);
@@ -203,7 +203,10 @@ public class Painter {
                 drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "restaurant", name, 5);
                 System.out.println("Gastronomy: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
             }
-            case Comercial -> drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, ColorPalette.SPECIAL_BUILDING_SECONDARY);
+            case Comercial -> {
+                drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, ColorPalette.SPECIAL_BUILDING_SECONDARY);
+                System.out.println("Comercial: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
+            }
             case SwimmingAll -> {
                 System.out.println("SwimmingAll: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
                 drawGeometryBasedOnType(z, geom, ColorPalette.SWIMMING_BLUE_PRIMARY, 3, ColorPalette.SWIMMING_BLUE_SECONDARY);
@@ -231,6 +234,7 @@ public class Painter {
             case TouristInformation -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "touristinfo", name, 25);
             case CommercialArea -> drawGeometryBasedOnType(z, geom, ColorPalette.COMMERCIAL_AREA_PRIMARY, 3, ColorPalette.COMMERCIAL_AREA_SECONDARY);
             case PublicParking -> drawSpecialArea(z, geom, ColorPalette.PLAZA_PRIMARY, 3, ColorPalette.PLAZA_SECONDARY, "parkinglot", "", 15);
+            case PrivateParking -> drawGeometryBasedOnType(z, geom, ColorPalette.PLAZA_PRIMARY, 3, ColorPalette.PLAZA_SECONDARY);
             case CarParking -> drawSpecialArea(z, geom, ColorPalette.BUILDING_PRIMARY, 3, ColorPalette.BUILDING_SECONDARY, "parking_house", "", 15);
             case TaxiRank -> drawSpecialArea(z, geom, ColorPalette.PLAZA_PRIMARY, 3, ColorPalette.PLAZA_SECONDARY, "taxi", "", 15);
             case GastronomyArea -> drawGeometryBasedOnType(z, geom, ColorPalette.GASTRONOMY_AREA_PRIMARY, 3, ColorPalette.GASTRONOMY_AREA_SECONDARY);
@@ -240,6 +244,7 @@ public class Painter {
             case IceCreamShop -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "icecream", name, 5);
             case CommerceBuildings -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "shop", name, 5);
             case Craftmanship -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "craft", name, 5);
+            case AllotmentGarden -> drawGeometryBasedOnType(z, geom, ColorPalette.ALLOTMENT_GARDEN_GREEN_PRIMARY, 3, ColorPalette.ALLOTMENT_GARDEN_GREEN_SECONDARY);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -462,7 +467,7 @@ public class Painter {
         return width;
     }
 
-    private void drawStreet(Geometry geom, StreetCategory streetCategory, String name) {
+    private void drawStreet(Geometry geom, StreetCategory streetCategory, String name, String refName) {
         int lineWidth = scaleLineWidth(streetCategory.getWidth());
         Color color = streetCategory.getColor();
 
@@ -497,12 +502,6 @@ public class Painter {
 
                 double midX = (StartX + EndX) / 2;
                 double midY = (StartY + EndY) / 2;
-
-                if (streetCategory == StreetCategory.AUTOBAHN) {
-                    //TODO - use Autobahn Icon
-                } else if (streetCategory == StreetCategory.BUNDESSTRASSE) {
-                    //TODO - use Bundestrasse Icon
-                }
                 
                 Shape textShape = getTextShape(9999998, name, fontSize);
                 Shape centeredTextShape = centerTextShape(textShape, midX, midY);
@@ -512,6 +511,64 @@ public class Painter {
                 if (bounds.getX() < 0 || bounds.getY() < 0 || bounds.getX() + bounds.getWidth() > width || bounds.getY() + bounds.getHeight() > height) {
                     distSinceLastText = 0; // Reset distance if text goes over borders
                     continue;
+                }
+
+                // Draw the icon
+                Graphics2D g = getGraphicForZ(9999998);
+                BufferedImage iconImage = null;
+                int iconTargetWidth = (int)(0.020 * width);
+
+                try {
+                    // Draw at start or end of street segment depending which x coordinate is smaller
+                    if (refName != null && !refName.isEmpty() && (streetCategory == StreetCategory.AUTOBAHN) || (streetCategory == StreetCategory.BUNDESSTRASSE)) {
+                        g.setFont(new Font("Arial", Font.PLAIN, fontSize));
+                        FontMetrics metrics = g.getFontMetrics();
+                        int textWidth = metrics.stringWidth(refName);
+                        int textHeight = metrics.getHeight();
+                        if (iconTargetWidth < textWidth) {
+                            iconTargetWidth = textWidth + 6; // Minimum icon width
+                        }
+                        double scale = 1.0;
+
+                        if (streetCategory == StreetCategory.AUTOBAHN) {
+                            iconImage = ImageIO.read(new File("icons" +File.separator + "Autobahnnummer.png"));
+                            scale = iconImage.getWidth() / (double) iconTargetWidth;
+                            iconImage = getScaledImage(iconImage, iconTargetWidth);
+                        } else if (streetCategory == StreetCategory.BUNDESSTRASSE) {
+                            iconImage = ImageIO.read(new File("icons" +File.separator + "Bundesstrassennummer.png"));
+                            scale = iconImage.getWidth() / (double) iconTargetWidth;
+                            iconImage = getScaledImage(iconImage, iconTargetWidth);
+                        }
+
+                        // Calculate the render point based on the start or end coordinate
+                        int[] renderPoint = new int[2];
+                        if (StartX < EndX) {
+                            renderPoint[0] = (int) ((StartX - offsetX) / meterPerPixel) - iconImage.getWidth() / 2;
+                            renderPoint[1] = height - (int) ((StartY - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
+                        } else {
+                            renderPoint[0] = (int) ((EndX - offsetX) / meterPerPixel) - iconImage.getWidth() / 2;
+                            renderPoint[1] = height - (int) ((EndY - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
+                        }
+
+                        g.drawImage(iconImage, renderPoint[0], renderPoint[1], null);
+
+                        // write the refName if it is not empty
+                        if (refName != null && !refName.isEmpty()) {
+                            // Write text simple
+                            Shape textShapeRef = getTextShape(9999999, refName, fontSize);
+                            int[] textCenterRef = {
+                                    renderPoint[0] + iconImage.getWidth() / 2,
+                                    renderPoint[1] + iconImage.getHeight() / 2
+                            };
+                            // Affine transform text to center at renderPoint
+                            AffineTransform transform = AffineTransform.getTranslateInstance(textCenterRef[0] - textShapeRef.getBounds2D().getWidth() / 2, textCenterRef[1] + textShapeRef.getBounds2D().getHeight() / 2);
+                            Shape transformedTextShape = transform.createTransformedShape(textShapeRef);
+                            g.setColor(Color.BLACK);
+                            g.fill(transformedTextShape);
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
                 //System.out.println("Drawing street name: " + name + " at angle: " + angle);

@@ -12,6 +12,8 @@ public class ColorPalette {
     public static final Color PLAYGROUND_GREEN_SECONDARY =  new Color(177, 201, 180);
     public static final Color CEMETERY_GREEN_PRIMARY = new Color(170, 203, 175);
     public static final Color CEMETERY_GREEN_SECONDARY = new Color(105, 126, 109);
+    public static final Color ALLOTMENT_GARDEN_GREEN_PRIMARY = new Color(201, 225, 191);
+    public static final Color ALLOTMENT_GARDEN_GREEN_SECONDARY = new Color(155, 174, 147);
 
     // Streets, Paths, Roads and Plazas
     public static final Color ROAD_PRIMARY = Color.GRAY;
