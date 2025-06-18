@@ -1,0 +1,1 @@
+java -cp geo.jar;mitl.jar mitl.Mapout 49.454752 11.101376 2048 1024 2000.0 2000Meter_Woehrder_See_Nuernberg.png

@@ -1,0 +1,1 @@
+java -cp geo.jar;mitl.jar mitl.Mapout 49.480061 10.988551 2048 1024 1000.0 1000Meter_StMichael_Fuerth.png

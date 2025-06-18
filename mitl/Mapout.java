@@ -3,29 +3,17 @@ package mitl;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.io.WKBReader;
-import com.vividsolutions.jts.io.WKBWriter;
-import com.vividsolutions.jts.io.WKTWriter;
-import fu.geo.Spherical;
 import fu.keys.LSIClassCentreDB;
-import fu.util.DBUtil;
-import mitl.projection.UTMProjection;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static mitl.LSIMapper.PaintType.Unspecified0Building;
 
 public class Mapout {
-
     private static GeometryFactory geomfact = new GeometryFactory();
     private static UTMProjection utmProjection = new UTMProjection();
     private static Painter mapPainter;
@@ -55,7 +43,6 @@ public class Mapout {
         Connection connection = DeproDBHelper.getMainConnection();
 
         Geometry queryGeometry = get_query_geometry(lat, lon, x, y, meter_x, connection);
-        System.out.println(new WKTWriter().writeFormatted(queryGeometry));
 
         mapPainter = new Painter(x, y, meterPerPixel, offsetX, offsetY);
 
@@ -112,7 +99,7 @@ public class Mapout {
                     }
                 }
 
-                // Get Ref name mostly for special streets
+                // Get Ref name mostly for special streets like B 1, A 4, etc.
                 String refName = null;
                 if (tags_name != null && tags_name.contains("ref=")) {
                     refName = tags_name.substring(tags_name.indexOf("ref=") + 4);
@@ -139,7 +126,6 @@ public class Mapout {
                 } else if (tags != null && tags.contains("landuse=retail")) {
                     // Workaround for retail landuse polygons that are falsely classified as SHOP.
                     // landuse=retail should only be used for areas, not for single shops according to OSM specification, as such this should not impact real shops.
-                    System.out.println("Recognizing retail landuse for " + realname);
                     mapPainter.paintLSIClass(d_id, LSIClassCentreDB.lsiClass("COMMERCIAL"), lsiClass2, lsiClass3, projectedGeometry, realname, refName, null);
                 }
                 else
@@ -149,13 +135,16 @@ public class Mapout {
             }
             resultSet.close();
 
-            System.out.println("Writing image ...");
+            System.out.println("\n--------------------------------------------------");
+            System.out.println("Writing image of size " + x + "x" + y + "...");
+            System.out.println("--------------------------------------------------\n");
+
             mapPainter.saveImage(filename);
             System.out.println("Image written to " + filename);
 
         }
         catch (Exception e) {
-            System.out.println("Error processing DB queries: "+e.toString());
+            System.out.println("Error processing DB queries: " + e.toString());
             e.printStackTrace();
             System.exit(1);
         }
@@ -168,8 +157,7 @@ public class Mapout {
         double meterY = meterPerPixel * mapY;
         double halfMeterY = meterY / 2;
 
-        System.out.println(halfMeterX + " " + halfMeterY);
-
+        // Calc on UTM coordinates allows us to simply use meter calculations.
         double[] utmCenter = utmProjection.project(lat, lon);
         int zone = utmProjection.getZone(lon);
         double[] invLeftTop = utmProjection.inverseProject(utmCenter[0] - halfMeterX, utmCenter[1] - halfMeterY, zone, connection);

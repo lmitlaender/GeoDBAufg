@@ -4,10 +4,8 @@ import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.operation.polygonize.Polygonizer;
 import fu.keys.LSIClassCentreDB;
-import mitl.projection.UTMProjection;
 
 import javax.imageio.ImageIO;
-import javax.xml.transform.Result;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
@@ -15,8 +13,6 @@ import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 
@@ -58,13 +54,13 @@ public class Painter {
     private int currentLsiClass = 0;
 
     public static enum StreetCategory {
-        AUTOBAHN(ColorPalette.ROAD_PRIMARY, 12),
-        KRAFTFAHRSTRASSE(ColorPalette.ROAD_PRIMARY, 8),
-        BUNDESSTRASSE(ColorPalette.ROAD_PRIMARY, 6),
-        STANDARD_STRASSE(ColorPalette.ROAD_PRIMARY, 3),
-        FELD_WALD_WEG(ColorPalette.ROAD_PRIMARY, 3),
-        AUFFAHRT(ColorPalette.ROAD_PRIMARY, 3),
-        ZUFAHRTPARKPLATZWEG(ColorPalette.ROAD_PRIMARY, 2);
+        AUTOBAHN(ColorPalette.ROAD_PRIMARY, 16),
+        KRAFTFAHRSTRASSE(ColorPalette.ROAD_PRIMARY, 11),
+        BUNDESSTRASSE(ColorPalette.ROAD_PRIMARY, 7),
+        STANDARD_STRASSE(ColorPalette.ROAD_PRIMARY, 4),
+        FELD_WALD_WEG(ColorPalette.ROAD_PRIMARY, 4),
+        AUFFAHRT(ColorPalette.ROAD_PRIMARY, 4),
+        ZUFAHRTPARKPLATZWEG(ColorPalette.ROAD_PRIMARY, 3);
 
         private final Color color;
         private final int width;
@@ -98,11 +94,17 @@ public class Painter {
     }
 
     public void saveImage(String filename) {
+        System.out.println("Drawing labels...");
+        System.out.println("--------------------------------------------------\n");
         drawLabels();
+        System.out.println("--------------------------------------------------\n");
         BufferedImage finalImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D gFinal = (Graphics2D) finalImage.getGraphics();
         gFinal.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Antialiasing einschalten
+        gFinal.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON); // Text Antialiasing einschalten
 
+        System.out.println("Combining " + gLayers.size() + " layers into final image...");
+        System.out.println("--------------------------------------------------");
         // Sort the layers by their keys
         Integer[] keys = gLayers.keySet().toArray(new Integer[0]);
         Arrays.sort(keys);
@@ -136,10 +138,6 @@ public class Painter {
             return;
         }
         int z = paintType.getZ();
-        if (paintType == LSIMapper.PaintType.TrainStation && name.isEmpty() || paintType == LSIMapper.PaintType.Comercial) {
-            // If the paint type is TrainStation and no name is given, use the LSI class name
-            System.out.println("Drawing on layer " + z + " with name: " + LSIClassCentreDB.className(lsiClass));
-        }
 
         switch (paintType) {
             case Autobahn -> drawStreet(geom, StreetCategory.AUTOBAHN, name, refName);
@@ -199,18 +197,10 @@ public class Painter {
             case ThemeParkArea -> drawSpecialArea(z, geom, ColorPalette.YELLOW_AREA_PRIMARY, 3, ColorPalette.YELLOW_AREA_SECONDARY, "social", name, 20);
             case Court -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "court", name, 20);
             case CityHall -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "tower", name, 20);
-            case Restaurants -> {
-                drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "restaurant", name, 5);
-                System.out.println("Gastronomy: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
-            }
-            case Comercial -> {
-                drawGeometryBasedOnType(z, geom, new Color(0, 0, 255, 150), 3, ColorPalette.SPECIAL_BUILDING_SECONDARY);
-                System.out.println("Comercial: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
-            }
-            case SwimmingAll -> {
-                System.out.println("SwimmingAll: " + name + ", lsiclass: " + LSIClassCentreDB.className(lsiClass));
-                drawGeometryBasedOnType(z, geom, ColorPalette.SWIMMING_BLUE_PRIMARY, 3, ColorPalette.SWIMMING_BLUE_SECONDARY);
-            }
+            case Restaurants -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "restaurant", name, 5);
+            case SwimmingWater -> drawGeometryBasedOnType(z, geom, ColorPalette.SWIMMING_BLUE_PRIMARY, 3, ColorPalette.SWIMMING_BLUE_SECONDARY);
+            case SwimmingArea -> drawSpecialArea(z, geom, ColorPalette.PLAYGROUND_GREEN_PRIMARY, 3, ColorPalette.PLAYGROUND_GREEN_SECONDARY, "swimming", name, 15);
+            case SwimmingBuilding -> drawSpecialArea(z, geom, ColorPalette.BUILDING_PRIMARY, 3, ColorPalette.BUILDING_SECONDARY, "swimming_house", name, 15);
             case RailPlatform, RoofWorkaround -> drawGeometryBasedOnType(z, geom, ColorPalette.RAIL_PLATFORM_PRIMARY, 1, ColorPalette.RAIL_PLATFORM_SECONDARY);
             case Sand -> drawGeometryBasedOnType(z, geom, ColorPalette.SAND_PRIMARY, 3, ColorPalette.SAND_SECONDARY);
             case Tower -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "tower", name, 5);
@@ -245,6 +235,9 @@ public class Painter {
             case CommerceBuildings -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "shop", name, 5);
             case Craftmanship -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "craft", name, 5);
             case AllotmentGarden -> drawGeometryBasedOnType(z, geom, ColorPalette.ALLOTMENT_GARDEN_GREEN_PRIMARY, 3, ColorPalette.ALLOTMENT_GARDEN_GREEN_SECONDARY);
+            case Castle -> drawSpecialArea(z, geom, ColorPalette.SPECIAL_BUILDING_PRIMARY, 3, ColorPalette.SPECIAL_BUILDING_SECONDARY, "tower", name, 25);
+            case Farmland -> drawGeometryBasedOnType(z, geom, ColorPalette.FARMLAND_GREEN_PRIMARY, 3, ColorPalette.FARMLAND_GREEN_SECONDARY);
+            case GarbageArea -> drawGeometryBasedOnType(z, geom, ColorPalette.GARBAGE_PRIMARY, 3, ColorPalette.GARBAGE_SECONDARY);
             //default -> System.out.println("Unhandled LSI code: " + lsiClass);
         }
     }
@@ -301,6 +294,7 @@ public class Painter {
         int priorityCutoff = (int) (meterPerPixel * width / 100);
         System.out.println("Priority cutoff for labels: " + priorityCutoff);
         Graphics2D g = getGraphicForZ(100000000);
+        int drawnCount = 0;
 
         while (!labelsToDraw.isEmpty() && labelsToDraw.peek().priority >= priorityCutoff) {
             Label label = labelsToDraw.poll();
@@ -355,8 +349,6 @@ public class Painter {
                 continue; // No valid label found
             }
 
-            System.out.println("Drawing label: " + bestPermutation + " at (" + bestRenderPoint[0] + ", " + bestRenderPoint[1] + ") with overlap: " + lowestOverlap);
-
             // Draw the best label image, if overlap is over 0.25 try to fall back to icon only with label text ""
             if (lowestOverlap < 0.25f) {
                 g.drawImage(bestLabelImage, bestRenderPoint[0], bestRenderPoint[1], null);
@@ -374,18 +366,15 @@ public class Painter {
                 bestRenderPoint[1] = height - (int) ((label.y - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
 
                 if (getOverlapRatio(iconImage, bestRenderPoint[0], bestRenderPoint[1], zImages.get(100000000)) > 0.25f) {
-                    System.out.println("Skipping icon for label: " + label.text + " due to high overlap in every draw version");
+                    System.out.println("Skipping icon of type: '" + label.icon + "' due to high overlap in every checked drawing option. Lowest overlap: " + lowestOverlap);
                     continue; // If the icon overlaps too much, skip drawing
                 }
 
                 g.drawImage(iconImage, bestRenderPoint[0], bestRenderPoint[1], null);
             }
-
-            g = getGraphicForZ(100000000);
-            // DEBUG - Draw a point at the center of the text
-            g.setColor(Color.RED);
-            g.fillOval(bestRenderPoint[0] + bestLabelImage.getWidth() / 2 - 2, bestRenderPoint[1] + bestLabelImage.getHeight() / 2 - 2, 4, 4);
+            drawnCount++;
         }
+        System.out.println("\n Drew " + drawnCount + " labels or icons not counting street names.");
     }
 
     public float getOverlapRatio(BufferedImage label, int x, int y, BufferedImage mask) {
@@ -473,13 +462,13 @@ public class Painter {
 
         drawGeometryBasedOnType(LSIMapper.PaintType.StandardStrasse.getZ(), geom, color, lineWidth, null);
 
-        // Draw text segments
+        // Ignore street names with "_", but still draw refName if exists.
         if (name.contains("_")) {
-            return;
+            name = "";
         }
 
         int fontSize = (int) Math.max(10, 10.0 * (width / 1024.0) * 0.8);
-        int fontWidth = (int) (fontSize * 0.6); // Approximate width of a char
+        int fontWidth = (int) (fontSize * 0.4); // Approximate width of a char
 
         if (geom instanceof LineString lineString) {
             int distSinceLastText = Integer.MAX_VALUE;
@@ -541,13 +530,26 @@ public class Painter {
                         }
 
                         // Calculate the render point based on the start or end coordinate
+                        // Calc vector between start and end point and move renderPoint along it for width of icon
+                        double vectorX = EndX - StartX;
+                        double vectorY = EndY - StartY;
+                        double vectorLength = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+                        if (vectorLength > 0) {
+                            vectorX /= vectorLength;
+                            vectorY /= vectorLength;
+                        }
+
                         int[] renderPoint = new int[2];
                         if (StartX < EndX) {
-                            renderPoint[0] = (int) ((StartX - offsetX) / meterPerPixel) - iconImage.getWidth() / 2;
-                            renderPoint[1] = height - (int) ((StartY - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
+                            renderPoint[0] = (int) (StartX - (vectorX * iconImage.getWidth()));
+                            renderPoint[1] = (int) (StartY - (vectorY * iconImage.getWidth()));
+                            renderPoint[0] = (int) ((renderPoint[0] - offsetX) / meterPerPixel) - iconImage.getWidth() / 2;
+                            renderPoint[1] = height - (int) ((renderPoint[1] - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
                         } else {
-                            renderPoint[0] = (int) ((EndX - offsetX) / meterPerPixel) - iconImage.getWidth() / 2;
-                            renderPoint[1] = height - (int) ((EndY - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
+                            renderPoint[0] = (int) (EndX + (vectorX * 20));
+                            renderPoint[1] = (int) (EndY + (vectorY * 20));
+                            renderPoint[0] = (int) ((renderPoint[0] - offsetX) / meterPerPixel) - iconImage.getWidth() / 2;
+                            renderPoint[1] = height - (int) ((renderPoint[1] - offsetY) / meterPerPixel) - iconImage.getHeight() / 2;
                         }
 
                         g.drawImage(iconImage, renderPoint[0], renderPoint[1], null);
@@ -611,12 +613,11 @@ public class Painter {
         String importId = DeproDBHelper.getImportId(currentDrawId);
         if (importId != null) {
             if (drawnMultis.contains(importId)) {
-                System.out.println("Already drawn MultiPolygon for import ID: " + importId);
                 return; // Skip if already drawn
             } else {
                 drawnMultis.add(importId);
             }
-            System.out.println("Import ID: " + importId + " Current Draw ID: " + currentDrawId);
+            System.out.println("Trying to rebuild geometry for import ID " + importId + " based on relations.");
             Geometry outerGeometry = buildOuterGeometry(importId);
             if (outerGeometry != null) {
                 Geometry innerGeometry = buildInnerGeometry(importId);
@@ -953,12 +954,8 @@ public class Painter {
 
         // Draw text shape
         drawTextShape(gCombined, textShape, Color.WHITE, 0, null);
-        // oval in middle of BufferedImage
-        gCombined.setColor(Color.MAGENTA);
-        gCombined.fillOval((totalWidth + 500) / 2, (totalHeight + 500) / 2, 4, 4);
 
         gCombined.dispose();
-
 
         return combinedImage;
     }

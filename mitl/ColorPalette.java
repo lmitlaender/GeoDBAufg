@@ -14,6 +14,8 @@ public class ColorPalette {
     public static final Color CEMETERY_GREEN_SECONDARY = new Color(105, 126, 109);
     public static final Color ALLOTMENT_GARDEN_GREEN_PRIMARY = new Color(201, 225, 191);
     public static final Color ALLOTMENT_GARDEN_GREEN_SECONDARY = new Color(155, 174, 147);
+    public static final Color FARMLAND_GREEN_PRIMARY = new Color(238, 240, 213);
+    public static final Color FARMLAND_GREEN_SECONDARY = new Color(187, 189, 167);
 
     // Streets, Paths, Roads and Plazas
     public static final Color ROAD_PRIMARY = Color.GRAY;
@@ -41,6 +43,8 @@ public class ColorPalette {
     public static final Color GASTRONOMY_AREA_SECONDARY = new Color(204, 195, 183);
     public static final Color MARKET_PRIMARY = new Color(229, 247, 255);
     public static final Color MARKET_SECONDARY = new Color(210, 233, 247);
+    public static final Color GARBAGE_PRIMARY = new Color(182, 181, 146);
+    public static final Color GARBAGE_SECONDARY = new Color(131, 130, 105);
 
     // Water Colors
     public static final Color SWIMMING_BLUE_PRIMARY = new Color(194, 237, 255);

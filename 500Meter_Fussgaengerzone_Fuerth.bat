@@ -1,0 +1,1 @@
+java -cp geo.jar;mitl.jar mitl.Mapout 49.476980 10.989120 2048 1024 499.9 500Meter_Fussgaengerzone_Fuerth.png

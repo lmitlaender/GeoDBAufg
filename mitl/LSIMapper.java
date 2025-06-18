@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 public class LSIMapper {
 
     public static enum PaintType {
+        Farmland(500),
         CommercialArea(800),
         GastronomyArea(850),
         MedicalArea(900),
@@ -24,14 +25,18 @@ public class LSIMapper {
         HistoricOthersArea(900),
         GeneralGreen(1000),
         Naherholungsgebiet(1000),
+        SwimmingArea(1125),
+        Markets(1125),
         Sand(1250),
         Cemetery(1500),
         Forest(2000),
+        GarbageArea(2500),
         AllotmentGarden(2500),
         Sportplatz(3000),
         Fussballplatz(3000),
         Playground(3500),
         Water(4000),
+        SwimmingWater(4200),
         PrivateParking(4400),
         PublicParking(4500),
         Bridge(5000),
@@ -44,8 +49,6 @@ public class LSIMapper {
         AdditionalSmallRoads(6000),
         RoofWorkaround(6250),
         RailPlatform(6500),
-
-        Markets(6750),
         Rail(7000),
         FootCyclePath(7000),
         PedestrianZone(8000),
@@ -66,12 +69,12 @@ public class LSIMapper {
         Tower(8900),
         Post(8900),
         Building(9000),
+        SwimmingBuilding(9000),
         Unspecified0Building(9000),
         Restaurants(9000),
         Bar(9000),
         Cafe(9000),
         IceCreamShop(9000),
-        Comercial(9000),
         Hairdresser(9000),
         ClothingAndShoeShops(9000),
         GenericShop(9000),
@@ -90,8 +93,8 @@ public class LSIMapper {
         CarParking(9000),
         Craftmanship(9000),
         CommerceBuildings(9000),
+        Castle(9000),
         TrainStation(9500),
-        SwimmingAll(10000)
         ;
 
         private final int z;
@@ -255,40 +258,15 @@ public class LSIMapper {
                 list.add(LSIClassCentreDB.lsiClass("RESTAURANT"));
                 list.add(LSIClassCentreDB.lsiClass("GASTRONOMY_MORE"));
                 return list;
-            case Comercial:
-                list = getLSICodeList(LSIClassCentreDB.lsiClass("COMMERCIAL"), true);
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GASTRONOMY"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("SHOP"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("FRISOER"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("KLEIDUNG"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("BUCHGESCHAEFT"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("FAHRRADGESCHAEFT_ALL"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GELDAUTOMAT"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("BANK_KREDITUNTERNEHMEN"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("UEBERNACHTUNGEN"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("POST"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("ELEKTRONIKSHOP"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("TOILETS"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GESCHENKARTIKEL"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("FLORIST"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GALERIE"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("BAECKER"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("FLEISCHER"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("GETRAENKEMARKT"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("WEINHANDEL"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("SUPERMARKT"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("CONVENIENCE"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("DROGERIE"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("DIENSTLEISTUNG_AUTO"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("TOURIST_INFO"), true));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("TOURIST_OFFICE"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("TANKSTELLE"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("WASCHANLAGE"), false));
-                list.removeAll(getLSICodeList(LSIClassCentreDB.lsiClass("COMMERCIAL"), false));
-
+            case SwimmingWater:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("SCHWIMMBAD_ALL"), false);
+                list.add(LSIClassCentreDB.lsiClass("SWIMMING_POOL"));
+                list.add(LSIClassCentreDB.lsiClass("NATURFREIBAD"));
                 return list;
-            case SwimmingAll:
-                return getLSICodeList(LSIClassCentreDB.lsiClass("SCHWIMMBAD_ALL"), true);
+            case SwimmingArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("FREIBAD"), false);
+            case SwimmingBuilding:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("HALLENBAD"), false);
             case RailPlatform:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("BAHNSTEIG"), false);
             case TrainStation:
@@ -309,6 +287,9 @@ public class LSIMapper {
                 list.removeIf(x -> x == LSIClassCentreDB.lsiClass("KIRCHE_HISTORIC"));
                 list.removeIf(x -> x == LSIClassCentreDB.lsiClass("KLOSTER_HISTORIC"));
                 list.removeIf(x -> x == LSIClassCentreDB.lsiClass("RATHAUS_HISTORIC"));
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("RUINE"));
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("SCHLOSS"));
+                list.removeIf(x -> x == LSIClassCentreDB.lsiClass("BURG"));
                 return list;
             case Hairdresser:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("FRISOER"), false);
@@ -390,6 +371,15 @@ public class LSIMapper {
                 return getLSICodeList(LSIClassCentreDB.lsiClass("MARKTPLATZ"), false);
             case AllotmentGarden:
                 return getLSICodeList(LSIClassCentreDB.lsiClass("SCHREBERGAERTEN"), false);
+            case Castle:
+                list = getLSICodeList(LSIClassCentreDB.lsiClass("SCHLOSS"), false);
+                list.add(LSIClassCentreDB.lsiClass("BURG"));
+                list.add(LSIClassCentreDB.lsiClass("RUINE"));
+                return list;
+            case Farmland:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("ACKERLAND"), false);
+            case GarbageArea:
+                return getLSICodeList(LSIClassCentreDB.lsiClass("MUELLDEPONIE"), false);
             default:
                 throw new IllegalArgumentException("Unknown PaintType: " + type);
         }

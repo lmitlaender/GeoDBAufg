@@ -1,8 +1,7 @@
-package mitl.projection;
+package mitl;
 
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKBReader;
 import com.vividsolutions.jts.io.WKTReader;
 
 import java.sql.Connection;
@@ -11,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UTMProjection {
-
     private static final double FLATTENING = 1 / 298.257223563;
     private static final double a = 6378.137; // EQUATORIAL_RADIUS in km
     private static final double k_0 = 0.9996;
